@@ -2,7 +2,7 @@ use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 use std::io::{self, Read};
 
 pub struct Packet {
-    pub raw_bytes: Vec<u8>,
+    raw_bytes: Vec<u8>,
 }
 
 impl Packet {
