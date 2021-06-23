@@ -1,5 +1,5 @@
 use crate::db_id::DbId;
-use crate::packet::Packet;
+use crate::packet::RawPacket;
 use byteorder::ReadBytesExt;
 use itertools::Itertools;
 use sha2::{Digest, Sha256};
@@ -8,7 +8,7 @@ use std::io::{self, Error, ErrorKind, Read};
 
 pub struct Block {
     pub db_id: DbId,
-    pub packets: Vec<Packet>,
+    pub packets: Vec<RawPacket>,
 }
 
 impl Block {
@@ -37,7 +37,7 @@ impl Block {
         reader.read_exact(&mut hash)?;
 
         let packets = (0..packet_count)
-            .map(|_| Packet::read(reader))
+            .map(|_| RawPacket::read(reader))
             .try_collect()?;
 
         let block = Block {
