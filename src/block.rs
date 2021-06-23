@@ -1,3 +1,4 @@
+use crate::db_id::DbId;
 use crate::packet::Packet;
 use byteorder::ReadBytesExt;
 use itertools::Itertools;
@@ -6,7 +7,7 @@ use std::convert::TryFrom;
 use std::io::{self, Error, ErrorKind, Read};
 
 pub struct Block {
-    pub db_id: [u8; 16],
+    pub db_id: DbId,
     pub packets: Vec<Packet>,
 }
 
@@ -39,7 +40,10 @@ impl Block {
             .map(|_| Packet::read(reader))
             .try_collect()?;
 
-        let block = Block { db_id, packets };
+        let block = Block {
+            db_id: DbId(db_id),
+            packets,
+        };
 
         if block.digest() == hash {
             Ok(block)
@@ -50,7 +54,7 @@ impl Block {
 
     fn digest(&self) -> [u8; 32] {
         let mut digest = Sha256::new();
-        digest.update(self.db_id);
+        digest.update(&self.db_id);
         digest.update(&[u8::try_from(self.packets.len()).unwrap()]);
         for packet in &self.packets {
             digest.update(packet);
