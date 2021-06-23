@@ -1,5 +1,7 @@
 mod add;
+mod block;
 mod options;
+mod packet;
 
 use crate::add::add;
 use crate::options::{Options, Subcommand};
