@@ -1,5 +1,6 @@
+use crate::blob_id::BlobId;
+use arrayref::array_ref;
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
-use std::convert::TryFrom;
 use std::io::{self, Error, ErrorKind, Read};
 
 pub enum Packet {
@@ -39,6 +40,20 @@ impl AsRef<[u8]> for RawPacket {
     }
 }
 
+impl AsRef<[u8]> for Packet {
+    fn as_ref(&self) -> &[u8] {
+        match self {
+            Packet::BlobData(packet) => packet.as_ref(),
+        }
+    }
+}
+
+impl AsRef<[u8]> for BlobDataPacket {
+    fn as_ref(&self) -> &[u8] {
+        self.0.as_ref()
+    }
+}
+
 impl From<RawPacket> for Packet {
     fn from(raw: RawPacket) -> Self {
         match raw.0[1] >> 4 {
@@ -53,5 +68,19 @@ impl From<Packet> for RawPacket {
         match packet {
             Packet::BlobData(BlobDataPacket(raw_packet)) => raw_packet,
         }
+    }
+}
+
+impl BlobDataPacket {
+    pub fn blob_id(&self) -> BlobId {
+        BlobId(array_ref!(self.as_ref(), 0, 32).clone())
+    }
+
+    pub fn offset(&self) -> u64 {
+        u64::from_le_bytes(array_ref!(self.as_ref(), 32, 8).clone())
+    }
+
+    pub fn data(&self) -> &[u8] {
+        &self.as_ref()[40..]
     }
 }
