@@ -1,6 +1,6 @@
 use crate::blob_id::BlobId;
 use arrayref::array_ref;
-use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
+use byteorder::{ByteOrder, LittleEndian, ReadBytesExt, WriteBytesExt};
 use std::io::{self, Error, ErrorKind, Read};
 
 pub enum Packet {
@@ -77,7 +77,7 @@ impl BlobDataPacket {
     }
 
     pub fn offset(&self) -> u64 {
-        u64::from_le_bytes(array_ref!(self.as_ref(), 32, 8).clone())
+        LittleEndian::read_u64(array_ref!(self.as_ref(), 32, 8))
     }
 
     pub fn data(&self) -> &[u8] {
