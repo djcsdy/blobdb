@@ -1,4 +1,4 @@
-use crate::blob_id::BlobId;
+use crate::lib::blob_id::BlobId;
 use arrayref::array_ref;
 use byteorder::{ByteOrder, LittleEndian, ReadBytesExt, WriteBytesExt};
 use std::io::{self, Error, ErrorKind, Read};

@@ -1,4 +1,4 @@
-use crate::options::AddOptions;
+use crate::cli::options::AddOptions;
 use sha2::{Digest, Sha256};
 use std::fs::File;
 use std::io::{copy, Error};

@@ -1,5 +1,5 @@
-use crate::db_id::DbId;
-use crate::packet::RawPacket;
+use crate::lib::db_id::DbId;
+use crate::lib::packet::RawPacket;
 use byteorder::ReadBytesExt;
 use itertools::Itertools;
 use sha2::{Digest, Sha256};
