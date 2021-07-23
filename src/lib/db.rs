@@ -12,7 +12,7 @@ use std::{fs, io};
 pub struct Db {
     pub id: DbId,
     pub path: Box<Path>,
-    lock: File,
+    lock: Option<File>,
 }
 
 impl Db {
@@ -52,7 +52,14 @@ impl Db {
         Ok(Db {
             id,
             path: path.into(),
-            lock,
+            lock: Some(lock),
         })
+    }
+}
+
+impl Drop for Db {
+    fn drop(&mut self) {
+        self.lock = None;
+        fs::remove_file(self.path.join("BlobDB.lock"));
     }
 }
