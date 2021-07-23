@@ -4,7 +4,7 @@ use crate::lib::packet::Packet;
 use fs2::FileExt;
 use itertools::Itertools;
 use std::ffi::OsStr;
-use std::fs::File;
+use std::fs::{File, OpenOptions};
 use std::io::{Error, ErrorKind, Seek};
 use std::path::Path;
 use std::{fs, io};
@@ -29,7 +29,9 @@ impl Db {
     }
 
     fn open_dir(path: &Path) -> io::Result<Db> {
-        let lock = File::open(path.join("BlobDB.lock"))?;
+        let lock = OpenOptions::new()
+            .create(true)
+            .open(path.join("BlobDB.lock"))?;
         lock.lock_exclusive()?;
 
         let mut root_file = File::open(path.join("BlobDB"))?;
