@@ -22,7 +22,7 @@ impl Db {
         } else if path.file_name() == Some(OsStr::new("BlobDB")) {
             path.parent()
                 .ok_or(io::Error::from(ErrorKind::NotFound))
-                .and_then(|path| Db::open_dir(path))
+                .and_then(Db::open_dir)
         } else {
             Err(io::Error::from(ErrorKind::NotFound))
         }
