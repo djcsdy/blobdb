@@ -1,9 +1,11 @@
 use crate::lib::block::Block;
 use crate::lib::db_id::DbId;
+use crate::lib::packet::Packet;
 use fs2::FileExt;
+use itertools::Itertools;
 use std::ffi::OsStr;
 use std::fs::File;
-use std::io::ErrorKind;
+use std::io::{Error, ErrorKind, Seek};
 use std::path::Path;
 use std::{fs, io};
 
@@ -31,9 +33,19 @@ impl Db {
         lock.lock_exclusive()?;
 
         let mut root_file = File::open(path.join("BlobDB"))?;
-        Block::read(&mut root_file)?;
+        let block = Block::read(&mut root_file)?;
+        let end = Block::read(&mut root_file);
 
-        let id = todo!();
+        if !block.packets.is_empty()
+            || end
+                .err()
+                .map(|err| err.kind() != ErrorKind::UnexpectedEof)
+                .unwrap_or(false)
+        {
+            return Err(io::Error::from(ErrorKind::InvalidData));
+        }
+
+        let id = block.db_id;
 
         Ok(Db {
             id,
