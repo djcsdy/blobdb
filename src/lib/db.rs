@@ -60,6 +60,6 @@ impl Db {
 impl Drop for Db {
     fn drop(&mut self) {
         self.lock = None;
-        fs::remove_file(self.path.join("BlobDB.lock"));
+        fs::remove_file(self.path.join("BlobDB.lock")).unwrap_or_default();
     }
 }
