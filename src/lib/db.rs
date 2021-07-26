@@ -1,11 +1,9 @@
 use crate::lib::block::Block;
 use crate::lib::db_id::DbId;
-use crate::lib::packet::Packet;
 use fs2::FileExt;
-use itertools::Itertools;
 use std::ffi::OsStr;
 use std::fs::{File, OpenOptions};
-use std::io::{Error, ErrorKind, Seek};
+use std::io::ErrorKind;
 use std::path::Path;
 use std::{fs, io};
 
