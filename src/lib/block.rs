@@ -12,6 +12,17 @@ pub struct Block {
 }
 
 impl Block {
+    pub fn new<I, P>(db_id: DbId, packets: I) -> Block
+    where
+        P: Into<RawPacket>,
+        I: IntoIterator<Item = P>,
+    {
+        Block {
+            db_id,
+            packets: packets.into_iter().map(P::into).collect(),
+        }
+    }
+
     pub fn read<R>(reader: &mut R) -> io::Result<Block>
     where
         R: Read,
