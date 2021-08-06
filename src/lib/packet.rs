@@ -72,6 +72,15 @@ impl From<Packet> for RawPacket {
 }
 
 impl BlobDataPacket {
+    pub fn new(blob_id: BlobId, offset: u64, data: Vec<u8>) -> BlobDataPacket {
+        let mut raw_bytes = Vec::with_capacity(data.len() + 40);
+        raw_bytes[0..32].copy_from_slice(&blob_id.0);
+        LittleEndian::write_u64(&mut raw_bytes[32..40], offset);
+        raw_bytes[40..].copy_from_slice(&data);
+
+        BlobDataPacket(RawPacket(raw_bytes))
+    }
+
     pub fn blob_id(&self) -> BlobId {
         BlobId(array_ref!(self.as_ref(), 0, 32).clone())
     }
