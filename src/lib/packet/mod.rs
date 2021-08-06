@@ -24,3 +24,9 @@ impl From<RawPacket> for Packet {
         }
     }
 }
+
+impl From<BlobDataPacket> for Packet {
+    fn from(packet: BlobDataPacket) -> Self {
+        Packet::BlobData(packet)
+    }
+}
