@@ -1,5 +1,5 @@
 use crate::lib::db_id::DbId;
-use crate::lib::packet::RawPacket;
+use crate::lib::packet::{Packet, RawPacket};
 use byteorder::ReadBytesExt;
 use itertools::Itertools;
 use sha2::{Digest, Sha256};
@@ -14,12 +14,16 @@ pub struct Block {
 impl Block {
     pub fn new<I, P>(db_id: DbId, packets: I) -> Block
     where
-        P: Into<RawPacket>,
+        P: Into<Packet>,
         I: IntoIterator<Item = P>,
     {
         Block {
             db_id,
-            packets: packets.into_iter().map(P::into).collect(),
+            packets: packets
+                .into_iter()
+                .map(P::into)
+                .map(RawPacket::from)
+                .collect(),
         }
     }
 

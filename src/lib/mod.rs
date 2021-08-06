@@ -1,3 +1,4 @@
+mod blob;
 mod blob_id;
 mod block;
 mod db;
