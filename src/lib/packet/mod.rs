@@ -2,7 +2,6 @@ pub use blob_data::BlobDataPacket;
 pub use raw::RawPacket;
 
 mod blob_data;
-mod packet;
 mod raw;
 
 pub enum Packet {
