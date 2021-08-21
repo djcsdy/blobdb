@@ -1,9 +1,7 @@
 use crate::lib::blob_id::BlobId;
-use crate::lib::packet::Packet::BlobData;
 use crate::lib::packet::RawPacket;
 use arrayref::array_ref;
 use byteorder::{ByteOrder, LittleEndian};
-use sha2::digest::FixedOutput;
 use sha2::{Digest, Sha256};
 use std::io::{ErrorKind, Read, Result};
 use tee_readwrite::TeeReader;

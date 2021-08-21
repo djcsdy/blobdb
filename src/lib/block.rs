@@ -6,7 +6,6 @@ use itertools::Itertools;
 use sha2::{Digest, Sha256};
 use std::convert::TryFrom;
 use std::io::{self, Error, ErrorKind, Read, Result};
-use std::iter::Map;
 use Iterator;
 
 pub struct Block {
