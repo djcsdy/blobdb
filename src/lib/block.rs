@@ -98,6 +98,6 @@ impl<R: Read> Iterator for ImportBlobDataBlocks<R> {
     fn next(&mut self) -> Option<Self::Item> {
         self.packets
             .next()
-            .map(|result| result.map(|packet| Block::new(self.db_id.clone(), [packet])))
+            .map(|result| result.map(|packet| Block::new(self.db_id, [packet])))
     }
 }
