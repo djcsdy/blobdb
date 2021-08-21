@@ -1,3 +1,4 @@
+use crate::lib::blob_id::BlobId;
 use crate::lib::db_id::DbId;
 use crate::lib::packet::{BlobDataPacket, ImportBlobDataPackets, Packet, RawPacket};
 use byteorder::ReadBytesExt;
@@ -90,6 +91,12 @@ impl Block {
 pub struct ImportBlobDataBlocks<R: Read> {
     db_id: DbId,
     packets: ImportBlobDataPackets<R>,
+}
+
+impl<R: Read> ImportBlobDataBlocks<R> {
+    pub fn end_and_digest_id(self) -> BlobId {
+        self.packets.end_and_digest_id()
+    }
 }
 
 impl<R: Read> Iterator for ImportBlobDataBlocks<R> {

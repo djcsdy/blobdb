@@ -3,7 +3,10 @@ use crate::lib::packet::Packet::BlobData;
 use crate::lib::packet::RawPacket;
 use arrayref::array_ref;
 use byteorder::{ByteOrder, LittleEndian};
+use sha2::digest::FixedOutput;
+use sha2::{Digest, Sha256};
 use std::io::{ErrorKind, Read, Result};
+use tee_readwrite::TeeReader;
 
 pub struct BlobDataPacket(pub(super) RawPacket);
 
@@ -41,7 +44,7 @@ impl BlobDataPacket {
 
     pub fn import_blob<R: Read>(reader: R) -> ImportBlobDataPackets<R> {
         ImportBlobDataPackets {
-            reader,
+            tee_reader: TeeReader::new(reader, Sha256::new(), false),
             offset: 0,
             end: false,
         }
@@ -50,9 +53,16 @@ impl BlobDataPacket {
 
 #[must_use = "iterators are lazy and do nothing unless consumed"]
 pub struct ImportBlobDataPackets<R: Read> {
-    reader: R,
+    tee_reader: TeeReader<R, Sha256>,
     offset: u64,
     end: bool,
+}
+
+impl<R: Read> ImportBlobDataPackets<R> {
+    pub fn end_and_digest_id(self) -> BlobId {
+        let (_, digest) = self.tee_reader.into_inner();
+        BlobId(digest.finalize().into())
+    }
 }
 
 impl<R: Read> Iterator for ImportBlobDataPackets<R> {
@@ -67,7 +77,7 @@ impl<R: Read> Iterator for ImportBlobDataPackets<R> {
         let mut buf = [0 as u8; 4004];
         let mut pos = 0;
         loop {
-            match self.reader.read(&mut buf[pos..]) {
+            match self.tee_reader.read(&mut buf[pos..]) {
                 Ok(0) => break,
                 Ok(count) => pos += count,
                 Err(error) => match error.kind() {
