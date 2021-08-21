@@ -15,7 +15,10 @@ pub struct Db {
 
 impl Db {
     pub fn open(path: &Path) -> io::Result<Db> {
-        if fs::metadata(path)?.is_dir() {
+        if fs::metadata(path)
+            .map(|metadata| metadata.is_dir())
+            .unwrap_or(false)
+        {
             Db::open_dir(path)
         } else if path.file_name() == Some(OsStr::new("BlobDB")) {
             path.parent()
