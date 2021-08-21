@@ -29,6 +29,7 @@ impl Db {
     fn open_dir(path: &Path) -> io::Result<Db> {
         let lock = OpenOptions::new()
             .create(true)
+            .write(true)
             .open(path.join("BlobDB.lock"))?;
         lock.lock_exclusive()?;
 
