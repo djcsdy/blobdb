@@ -1,4 +1,4 @@
-pub use blob_data::BlobDataPacket;
+pub use blob_data::{BlobDataPacket, ImportBlobDataPackets};
 pub use raw::RawPacket;
 
 mod blob_data;

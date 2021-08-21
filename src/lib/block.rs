@@ -1,10 +1,12 @@
 use crate::lib::db_id::DbId;
-use crate::lib::packet::{Packet, RawPacket};
+use crate::lib::packet::{BlobDataPacket, ImportBlobDataPackets, Packet, RawPacket};
 use byteorder::ReadBytesExt;
 use itertools::Itertools;
 use sha2::{Digest, Sha256};
 use std::convert::TryFrom;
-use std::io::{self, Error, ErrorKind, Read};
+use std::io::{self, Error, ErrorKind, Read, Result};
+use std::iter::Map;
+use Iterator;
 
 pub struct Block {
     pub db_id: DbId,
@@ -75,5 +77,27 @@ impl Block {
             digest.update(packet);
         }
         digest.finalize().into()
+    }
+
+    pub fn import_blob<R: Read>(db_id: DbId, reader: R) -> ImportBlobDataBlocks<R> {
+        ImportBlobDataBlocks {
+            db_id,
+            packets: BlobDataPacket::import_blob(reader),
+        }
+    }
+}
+
+pub struct ImportBlobDataBlocks<R: Read> {
+    db_id: DbId,
+    packets: ImportBlobDataPackets<R>,
+}
+
+impl<R: Read> Iterator for ImportBlobDataBlocks<R> {
+    type Item = Result<Block>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.packets
+            .next()
+            .map(|result| result.map(|packet| Block::new(self.db_id.clone(), [packet])))
     }
 }

@@ -41,6 +41,7 @@ dependencies = [
  "fs2",
  "itertools",
  "sha2",
+ "tee_readwrite",
 ]
 
 [[package]]
@@ -277,6 +278,12 @@ dependencies = [
  "quote",
  "unicode-xid",
 ]
+
+[[package]]
+name = "tee_readwrite"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0642ac8a287350e5bd14ac50e7a137d49432ae625a1ae83668323ef3ca466af8"
 
 [[package]]
 name = "termcolor"

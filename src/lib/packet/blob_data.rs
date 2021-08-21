@@ -39,8 +39,8 @@ impl BlobDataPacket {
         &self.as_ref()[40..]
     }
 
-    pub fn import_blob<R: Read>(reader: R) -> ImportBlob<R> {
-        ImportBlob {
+    pub fn import_blob<R: Read>(reader: R) -> ImportBlobDataPackets<R> {
+        ImportBlobDataPackets {
             reader,
             offset: 0,
             end: false,
@@ -48,13 +48,14 @@ impl BlobDataPacket {
     }
 }
 
-pub struct ImportBlob<R: Read> {
+#[must_use = "iterators are lazy and do nothing unless consumed"]
+pub struct ImportBlobDataPackets<R: Read> {
     reader: R,
     offset: u64,
     end: bool,
 }
 
-impl<R: Read> Iterator for ImportBlob<R> {
+impl<R: Read> Iterator for ImportBlobDataPackets<R> {
     type Item = Result<BlobDataPacket>;
 
     fn next(&mut self) -> Option<Self::Item> {
