@@ -7,7 +7,7 @@ edition = "2018"
 
 [dependencies]
 clap = "=3.0.0-beta.4"
-sha2 = "=0.9.5"
+sha2 = "=0.9.6"
 itertools = "=0.10.1"
 byteorder = "=1.4.3"
 arrayref = "=0.3.6"
