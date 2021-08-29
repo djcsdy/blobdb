@@ -1,3 +1,4 @@
+mod block_digest;
 mod signature;
 
 use crate::lib::blob_id::BlobId;
