@@ -1,6 +1,7 @@
 #[derive(Copy, Clone)]
 pub struct BlockSignature<'a>(pub &'a [u8; 4]);
 
+#[derive(Eq, PartialEq)]
 pub enum BlockArity {
     Invalid,
     OnePacket,
