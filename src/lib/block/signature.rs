@@ -16,3 +16,9 @@ impl BlockSignature<'_> {
         }
     }
 }
+
+impl<'a> AsRef<[u8; 4]> for BlockSignature<'a> {
+    fn as_ref(&self) -> &'a [u8; 4] {
+        self.0
+    }
+}
