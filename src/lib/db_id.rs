@@ -1,4 +1,4 @@
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Eq, PartialEq)]
 pub struct DbId(pub [u8; 16]);
 
 impl AsRef<[u8]> for DbId {
