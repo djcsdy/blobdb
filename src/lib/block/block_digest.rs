@@ -12,3 +12,9 @@ impl BlockDigest<'_> {
         BlockDigest(&digest.finalize().into())
     }
 }
+
+impl<'a> AsRef<[u8; 32]> for BlockDigest<'a> {
+    fn as_ref(&self) -> &'a [u8; 32] {
+        self.0
+    }
+}
