@@ -1,3 +1,5 @@
+mod signature;
+
 use crate::lib::blob_id::BlobId;
 use crate::lib::db_id::DbId;
 use crate::lib::packet::{BlobDataPacket, ImportBlobDataPackets, Packet, RawPacket};
