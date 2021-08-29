@@ -1,7 +1,7 @@
 use std::fmt::Write;
 use std::path::PathBuf;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Eq, PartialEq)]
 pub struct BlobId(pub [u8; 32]);
 
 impl BlobId {
