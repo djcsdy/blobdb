@@ -40,7 +40,9 @@ impl Db {
         let block = Block::read(&mut root_file)?;
         let end = Block::read(&mut root_file);
 
-        if !block.packets.is_empty()
+        let id = block.db_id();
+
+        if block.into_packets().len() != 0
             || end
                 .err()
                 .map(|err| err.kind() != ErrorKind::UnexpectedEof)
@@ -48,8 +50,6 @@ impl Db {
         {
             return Err(io::Error::from(ErrorKind::InvalidData));
         }
-
-        let id = block.db_id;
 
         Ok(Db {
             id,

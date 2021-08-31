@@ -29,6 +29,10 @@ impl RawPacket {
 
         Ok(RawPacket(raw_bytes))
     }
+
+    pub fn new_invalid() -> RawPacket {
+        RawPacket(vec![])
+    }
 }
 
 impl AsRef<[u8]> for RawPacket {
