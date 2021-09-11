@@ -76,3 +76,9 @@ impl Block {
         Packets::new(self, start, count)
     }
 }
+
+impl AsRef<[u8]> for Block {
+    fn as_ref(&self) -> &[u8] {
+        &self.0
+    }
+}
