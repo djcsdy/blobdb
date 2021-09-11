@@ -1,17 +1,18 @@
-mod block_digest;
-mod packets;
-mod signature;
+use std::convert::TryFrom;
+use std::io::{Read, Result, Write};
 
-use crate::lib::blob_id::BlobId;
+use arrayref::array_ref;
+
 use crate::lib::block::block_digest::BlockDigest;
 use crate::lib::block::packets::Packets;
 use crate::lib::block::signature::{BlockArity, BlockSignature};
 use crate::lib::db_id::DbId;
-use crate::lib::packet::{BlobDataPacket, ImportBlobDataPackets, Packet, RawPacket};
-use arrayref::array_ref;
-use std::convert::TryFrom;
-use std::io::{Read, Result, Write};
-use Iterator;
+use crate::lib::packet::{Packet, RawPacket};
+
+mod block_digest;
+mod import_blob;
+mod packets;
+mod signature;
 
 #[derive(Clone)]
 pub struct Block([u8; 4096]);
@@ -76,33 +77,5 @@ impl Block {
             BlockArity::ManyPackets => (53, 1),
         };
         Packets::new(self, start, count)
-    }
-
-    pub fn import_blob<R: Read>(db_id: DbId, reader: R) -> ImportBlobDataBlocks<R> {
-        ImportBlobDataBlocks {
-            db_id,
-            packets: BlobDataPacket::import_blob(reader),
-        }
-    }
-}
-
-pub struct ImportBlobDataBlocks<R: Read> {
-    db_id: DbId,
-    packets: ImportBlobDataPackets<R>,
-}
-
-impl<R: Read> ImportBlobDataBlocks<R> {
-    pub fn end_and_digest_id(self) -> BlobId {
-        self.packets.end_and_digest_id()
-    }
-}
-
-impl<R: Read> Iterator for ImportBlobDataBlocks<R> {
-    type Item = Result<Block>;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.packets
-            .next()
-            .map(|result| result.map(|packet| Block::new(self.db_id, vec![packet])))
     }
 }
