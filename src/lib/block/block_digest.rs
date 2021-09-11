@@ -1,4 +1,4 @@
-use crate::lib::block::Block;
+use crate::lib::block::block::Block;
 use sha2::{Digest, Sha256};
 
 #[derive(Copy, Clone, Eq, PartialEq)]

@@ -1,4 +1,4 @@
-use crate::lib::block::Block;
+use crate::lib::block::block::Block;
 use crate::lib::packet::{Packet, RawPacket};
 
 pub struct Packets {

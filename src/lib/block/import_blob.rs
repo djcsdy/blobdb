@@ -2,7 +2,7 @@ use std::io;
 use std::io::Read;
 
 use crate::lib::blob_id::BlobId;
-use crate::lib::block::Block;
+use crate::lib::block::block::Block;
 use crate::lib::db_id::DbId;
 use crate::lib::packet::{BlobDataPacket, ImportBlobDataPackets};
 
