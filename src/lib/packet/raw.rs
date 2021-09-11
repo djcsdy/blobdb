@@ -4,7 +4,7 @@ use std::io::{Error, ErrorKind, Read};
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 
 use crate::lib::packet::blob_data::BlobDataPacket;
-use crate::lib::packet::Packet;
+use crate::lib::packet::packet::Packet;
 
 pub struct RawPacket(pub(super) Vec<u8>);
 

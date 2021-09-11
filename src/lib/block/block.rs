@@ -1,14 +1,15 @@
-use arrayref::array_ref;
-
 use std::convert::TryFrom;
 use std::io;
 use std::io::{Read, Write};
+
+use arrayref::array_ref;
 
 use crate::lib::block::block_digest::BlockDigest;
 use crate::lib::block::packets::Packets;
 use crate::lib::block::signature::{BlockArity, BlockSignature};
 use crate::lib::db_id::DbId;
-use crate::lib::packet::{Packet, RawPacket};
+use crate::lib::packet::Packet;
+use crate::lib::packet::RawPacket;
 
 #[derive(Clone)]
 pub struct Block(pub(super) [u8; 4096]);
