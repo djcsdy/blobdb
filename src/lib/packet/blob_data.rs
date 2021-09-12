@@ -1,4 +1,4 @@
-use crate::lib::blob_id::BlobId;
+use crate::lib::blob::BlobId;
 use crate::lib::packet::RawPacket;
 use arrayref::array_ref;
 use byteorder::{ByteOrder, LittleEndian};

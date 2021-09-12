@@ -1,6 +1,6 @@
 pub use db::Db;
 
-mod blob_id;
+mod blob;
 mod block;
 mod db;
 mod packet;
