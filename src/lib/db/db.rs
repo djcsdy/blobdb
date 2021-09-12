@@ -8,8 +8,8 @@ use std::path::Path;
 use std::{fs, io};
 
 pub struct Db {
-    pub id: DbId,
-    pub path: Box<Path>,
+    id: DbId,
+    path: Box<Path>,
     lock: Option<File>,
 }
 
@@ -56,6 +56,10 @@ impl Db {
             path: path.into(),
             lock: Some(lock),
         })
+    }
+
+    pub fn id(&self) -> DbId {
+        self.id
     }
 }
 
