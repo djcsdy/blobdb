@@ -34,7 +34,7 @@ impl Db {
             .create(true)
             .write(true)
             .open(path.join("BlobDB.lock"))?;
-        lock.lock_exclusive()?;
+        lock.try_lock_exclusive()?;
 
         let mut root_file = File::open(path.join("BlobDB"))?;
         let block = Block::read(&mut root_file)?;
