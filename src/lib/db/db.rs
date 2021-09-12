@@ -1,5 +1,5 @@
 use crate::lib::block::Block;
-use crate::lib::db_id::DbId;
+use crate::lib::db::db_id::DbId;
 use fs2::FileExt;
 use std::ffi::OsStr;
 use std::fs::{File, OpenOptions};
