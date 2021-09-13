@@ -28,6 +28,10 @@ impl BlobDataPacket {
         BlobDataPacket::new(BlobId([0; 32]), offset, data)
     }
 
+    pub fn size(&self) -> usize {
+        self.0.size()
+    }
+
     pub fn blob_id(&self) -> BlobId {
         BlobId(array_ref!(self.as_ref(), 0, 32).clone())
     }

@@ -4,6 +4,14 @@ pub enum Packet {
     BlobData(BlobDataPacket),
 }
 
+impl Packet {
+    pub fn size(&self) -> usize {
+        match self {
+            Packet::BlobData(packet) => packet.size(),
+        }
+    }
+}
+
 impl AsRef<[u8]> for Packet {
     fn as_ref(&self) -> &[u8] {
         match self {

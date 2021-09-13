@@ -33,6 +33,10 @@ impl RawPacket {
     pub fn new_invalid() -> RawPacket {
         RawPacket(vec![])
     }
+
+    pub fn size(&self) -> usize {
+        self.0.len()
+    }
 }
 
 impl AsRef<[u8]> for RawPacket {
