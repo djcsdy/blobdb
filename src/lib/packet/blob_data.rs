@@ -8,11 +8,13 @@ use std::io::{ErrorKind, Read, Result};
 use tee_readwrite::TeeReader;
 
 const OFFSET_SIZE: usize = 8;
+pub const MAX_DATA_SIZE: usize = MAX_PACKET_SIZE - DATA_OFFSET;
 
 const BLOB_ID_OFFSET: usize = 0;
 const BLOB_ID_END: usize = BLOB_ID_OFFSET + BLOB_ID_SIZE;
 const OFFSET_OFFSET: usize = BLOB_ID_END;
 const OFFSET_END: usize = OFFSET_OFFSET + OFFSET_SIZE;
+const DATA_OFFSET: usize = OFFSET_END;
 
 pub struct BlobDataPacket(pub(super) RawPacket);
 
@@ -24,10 +26,10 @@ impl AsRef<[u8]> for BlobDataPacket {
 
 impl BlobDataPacket {
     pub fn new(blob_id: BlobId, offset: u64, data: Vec<u8>) -> BlobDataPacket {
-        let mut raw_bytes = Vec::with_capacity(data.len() + 40);
+        let mut raw_bytes = Vec::with_capacity(data.len() + DATA_OFFSET);
         raw_bytes[BLOB_ID_OFFSET..BLOB_ID_SIZE].copy_from_slice(&blob_id.0);
         LittleEndian::write_u64(&mut raw_bytes[OFFSET_OFFSET..OFFSET_END], offset);
-        raw_bytes[40..].copy_from_slice(&data);
+        raw_bytes[DATA_OFFSET..].copy_from_slice(&data);
 
         BlobDataPacket(RawPacket(raw_bytes))
     }
@@ -49,7 +51,7 @@ impl BlobDataPacket {
     }
 
     pub fn data(&self) -> &[u8] {
-        &self.as_ref()[40..]
+        &self.as_ref()[DATA_OFFSET..]
     }
 
     pub fn import_blob<R: Read>(reader: R) -> ImportBlobDataPackets<R> {
