@@ -11,12 +11,14 @@ use crate::lib::db::DbId;
 use crate::lib::packet::Packet;
 use crate::lib::packet::RawPacket;
 
+pub const BLOCK_SIZE: usize = 4096;
+
 #[derive(Clone)]
-pub struct Block(pub(super) [u8; 4096]);
+pub struct Block(pub(super) [u8; BLOCK_SIZE]);
 
 impl Block {
     pub fn new<P: Into<Packet>>(db_id: DbId, packets: Vec<P>) -> Block {
-        let mut buffer = [0; 4096];
+        let mut buffer = [0; BLOCK_SIZE];
 
         let (arity, packets_start) = match packets.len() {
             1 => (BlockArity::OnePacket, 52),
@@ -50,7 +52,7 @@ impl Block {
     where
         R: Read,
     {
-        let mut buffer = [0; 4096];
+        let mut buffer = [0; BLOCK_SIZE];
         reader.read_exact(&mut buffer)?;
         Ok(Block(buffer))
     }
