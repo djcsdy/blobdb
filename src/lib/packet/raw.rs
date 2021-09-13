@@ -34,15 +34,11 @@ impl RawPacket {
     }
 
     pub fn new_invalid() -> RawPacket {
-        RawPacket(vec![])
+        RawPacket(vec![0; DATA_OFFSET])
     }
 
     fn type_id_and_length(&self) -> u16 {
-        if self.0.len() >= TYPE_ID_AND_LENGTH_END {
-            LittleEndian::read_u16(&self.0[TYPE_ID_AND_LENGTH_OFFSET..TYPE_ID_AND_LENGTH_END])
-        } else {
-            0
-        }
+        LittleEndian::read_u16(&self.0[TYPE_ID_AND_LENGTH_OFFSET..TYPE_ID_AND_LENGTH_END])
     }
 
     pub fn type_id(&self) -> u8 {
