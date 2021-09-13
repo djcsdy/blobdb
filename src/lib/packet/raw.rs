@@ -4,10 +4,12 @@ use std::mem::size_of;
 
 use byteorder::{ByteOrder, LittleEndian, ReadBytesExt, WriteBytesExt};
 
+use crate::lib::block::ONE_PACKET_MAX_SIZE;
 use crate::lib::packet::blob_data::BlobDataPacket;
 use crate::lib::packet::invalid::InvalidPacket;
 use crate::lib::packet::packet::Packet;
 
+pub const MAX_PACKET_SIZE: usize = ONE_PACKET_MAX_SIZE;
 const TYPE_ID_AND_LENGTH_SIZE: usize = size_of::<u16>();
 
 const TYPE_ID_AND_LENGTH_OFFSET: usize = 0;

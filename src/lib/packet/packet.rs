@@ -1,9 +1,6 @@
-use crate::lib::block::ONE_PACKET_MAX_SIZE;
 use crate::lib::packet::blob_data::BLOB_DATA_PACKET_TYPE_ID;
 use crate::lib::packet::invalid::InvalidPacket;
 use crate::lib::packet::{BlobDataPacket, RawPacket};
-
-pub const MAX_PACKET_SIZE: usize = ONE_PACKET_MAX_SIZE;
 
 pub enum Packet {
     BlobData(BlobDataPacket),

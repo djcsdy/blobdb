@@ -1,5 +1,5 @@
 use crate::lib::blob::{BlobId, BLOB_ID_SIZE};
-use crate::lib::packet::packet::MAX_PACKET_SIZE;
+use crate::lib::packet::raw::MAX_PACKET_SIZE;
 use crate::lib::packet::RawPacket;
 use arrayref::array_ref;
 use byteorder::{ByteOrder, LittleEndian};
