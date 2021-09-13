@@ -4,7 +4,7 @@ use std::io::{Read, Write};
 
 use arrayref::array_ref;
 
-use crate::lib::block::block_digest::BlockDigest;
+use crate::lib::block::block_digest::{BlockDigest, BLOCK_DIGEST_SIZE};
 use crate::lib::block::packets::Packets;
 use crate::lib::block::signature::{BlockArity, BlockSignature, BLOCK_SIGNATURE_SIZE};
 use crate::lib::db::{DbId, DB_ID_SIZE};
@@ -17,6 +17,8 @@ const SIGNATURE_OFFSET: usize = 0;
 const SIGNATURE_END: usize = SIGNATURE_OFFSET + BLOCK_SIGNATURE_SIZE;
 const DB_ID_OFFSET: usize = SIGNATURE_END;
 const DB_ID_END: usize = DB_ID_OFFSET + DB_ID_SIZE;
+const DIGEST_OFFSET: usize = DB_ID_END;
+const DIGEST_END: usize = DIGEST_OFFSET + BLOCK_DIGEST_SIZE;
 
 #[derive(Clone)]
 pub struct Block(pub(super) [u8; BLOCK_SIZE]);
@@ -49,7 +51,7 @@ impl Block {
         }
 
         let digest = BlockDigest::digest_block(&Block(buffer));
-        buffer[20..52].copy_from_slice(digest.as_ref());
+        buffer[DIGEST_OFFSET..DIGEST_END].copy_from_slice(digest.as_ref());
 
         Block(buffer)
     }
@@ -72,7 +74,7 @@ impl Block {
     }
 
     fn digest(&self) -> BlockDigest {
-        BlockDigest(array_ref!(self.0, 20, 32).clone())
+        BlockDigest(array_ref!(self.0, DIGEST_OFFSET, BLOCK_DIGEST_SIZE).clone())
     }
 
     pub fn into_packets(self) -> Packets {
