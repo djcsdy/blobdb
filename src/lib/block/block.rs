@@ -13,6 +13,8 @@ use crate::lib::packet::RawPacket;
 
 pub const BLOCK_SIZE: usize = 4096;
 const PAYLOAD_SIZE: usize = BLOCK_SIZE - PAYLOAD_OFFSET;
+pub const ONE_PACKET_MAX_SIZE: usize = BLOCK_SIZE - ONE_PACKET_OFFSET;
+pub const MANY_PACKETS_MAX_SIZE: usize = BLOCK_SIZE - MANY_PACKETS_OFFSET;
 
 const SIGNATURE_OFFSET: usize = 0;
 const SIGNATURE_END: usize = SIGNATURE_OFFSET + BLOCK_SIGNATURE_SIZE;
