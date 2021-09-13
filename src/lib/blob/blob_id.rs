@@ -1,4 +1,3 @@
-use std::fmt::Write;
 use std::path::PathBuf;
 
 #[derive(Copy, Clone, Eq, PartialEq)]
@@ -6,11 +5,7 @@ pub struct BlobId(pub [u8; 32]);
 
 impl BlobId {
     pub fn name(&self) -> PathBuf {
-        let mut name = String::new();
-        for byte in self.0 {
-            write!(&mut name, "{:2x}", byte).unwrap();
-        }
-        name.into()
+        hex::encode(self.0).into()
     }
 }
 
