@@ -11,11 +11,11 @@ use crate::lib::packet::packet::Packet;
 
 pub const MAX_PACKET_SIZE: usize = ONE_PACKET_MAX_SIZE;
 const TYPE_ID_AND_LENGTH_SIZE: usize = size_of::<u16>();
-pub const MAX_DATA_SIZE: usize = MAX_PACKET_SIZE - DATA_OFFSET;
+pub const MAX_PAYLOAD_SIZE: usize = MAX_PACKET_SIZE - PAYLOAD_OFFSET;
 
 const TYPE_ID_AND_LENGTH_OFFSET: usize = 0;
 const TYPE_ID_AND_LENGTH_END: usize = TYPE_ID_AND_LENGTH_OFFSET + TYPE_ID_AND_LENGTH_SIZE;
-const DATA_OFFSET: usize = TYPE_ID_AND_LENGTH_END;
+const PAYLOAD_OFFSET: usize = TYPE_ID_AND_LENGTH_END;
 
 pub struct RawPacket(pub(super) Vec<u8>);
 
@@ -27,31 +27,31 @@ impl RawPacket {
         let type_id_and_length = reader.read_u16::<LittleEndian>()?;
         let length = type_id_and_length & 0xfff;
 
-        let mut raw_bytes = Vec::with_capacity(length as usize + DATA_OFFSET);
+        let mut raw_bytes = Vec::with_capacity(length as usize + PAYLOAD_OFFSET);
         raw_bytes
             .write_u16::<LittleEndian>(type_id_and_length)
             .unwrap();
-        reader.read_exact(&mut raw_bytes[DATA_OFFSET..])?;
+        reader.read_exact(&mut raw_bytes[PAYLOAD_OFFSET..])?;
 
         Ok(RawPacket(raw_bytes))
     }
 
-    pub fn new(type_id: u8, data: &[u8]) -> RawPacket {
-        if data.len() > MAX_DATA_SIZE {
+    pub fn new(type_id: u8, payload: &[u8]) -> RawPacket {
+        if payload.len() > MAX_PAYLOAD_SIZE {
             panic!();
         }
-        let mut raw_bytes = Vec::with_capacity(data.len() + DATA_OFFSET);
-        let type_id_and_length = ((data.len() as u16) & 0xfff) | ((type_id as u16) << 12);
+        let mut raw_bytes = Vec::with_capacity(payload.len() + PAYLOAD_OFFSET);
+        let type_id_and_length = ((payload.len() as u16) & 0xfff) | ((type_id as u16) << 12);
         LittleEndian::write_u16(
             &mut raw_bytes[TYPE_ID_AND_LENGTH_OFFSET..TYPE_ID_AND_LENGTH_END],
             type_id_and_length,
         );
-        raw_bytes[DATA_OFFSET..].copy_from_slice(data);
+        raw_bytes[PAYLOAD_OFFSET..].copy_from_slice(payload);
         RawPacket(raw_bytes)
     }
 
     pub fn new_invalid() -> RawPacket {
-        RawPacket(vec![0; DATA_OFFSET])
+        RawPacket(vec![0; PAYLOAD_OFFSET])
     }
 
     fn type_id_and_length(&self) -> u16 {
@@ -62,8 +62,8 @@ impl RawPacket {
         (self.type_id_and_length() >> 12) as u8
     }
 
-    pub fn data(&self) -> &[u8] {
-        &self.0[DATA_OFFSET..]
+    pub fn payload(&self) -> &[u8] {
+        &self.0[PAYLOAD_OFFSET..]
     }
 
     pub fn size(&self) -> usize {
