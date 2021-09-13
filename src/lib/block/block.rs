@@ -7,7 +7,7 @@ use arrayref::array_ref;
 use crate::lib::block::block_digest::BlockDigest;
 use crate::lib::block::packets::Packets;
 use crate::lib::block::signature::{BlockArity, BlockSignature, BLOCK_SIGNATURE_SIZE};
-use crate::lib::db::DbId;
+use crate::lib::db::{DbId, DB_ID_SIZE};
 use crate::lib::packet::Packet;
 use crate::lib::packet::RawPacket;
 
@@ -15,6 +15,8 @@ pub const BLOCK_SIZE: usize = 4096;
 
 const SIGNATURE_OFFSET: usize = 0;
 const SIGNATURE_END: usize = SIGNATURE_OFFSET + BLOCK_SIGNATURE_SIZE;
+const DB_ID_OFFSET: usize = SIGNATURE_END;
+const DB_ID_END: usize = DB_ID_OFFSET + DB_ID_SIZE;
 
 #[derive(Clone)]
 pub struct Block(pub(super) [u8; BLOCK_SIZE]);
@@ -31,7 +33,7 @@ impl Block {
         buffer[SIGNATURE_OFFSET..SIGNATURE_END]
             .copy_from_slice(BlockSignature::new(arity).as_ref());
 
-        buffer[4..20].copy_from_slice(db_id.as_ref());
+        buffer[DB_ID_OFFSET..DB_ID_END].copy_from_slice(db_id.as_ref());
 
         if arity == BlockArity::ManyPackets {
             buffer[52] = u8::try_from(packets.len()).unwrap()
@@ -66,7 +68,7 @@ impl Block {
     }
 
     pub fn db_id(&self) -> DbId {
-        DbId(*array_ref!(self.0, 4, 16))
+        DbId(*array_ref!(self.0, DB_ID_OFFSET, DB_ID_SIZE))
     }
 
     fn digest(&self) -> BlockDigest {
