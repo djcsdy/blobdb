@@ -17,7 +17,7 @@ const TYPE_ID_AND_LENGTH_OFFSET: usize = 0;
 const TYPE_ID_AND_LENGTH_END: usize = TYPE_ID_AND_LENGTH_OFFSET + TYPE_ID_AND_LENGTH_SIZE;
 const PAYLOAD_OFFSET: usize = TYPE_ID_AND_LENGTH_END;
 
-pub struct RawPacket(pub(super) Vec<u8>);
+pub struct RawPacket(Vec<u8>);
 
 impl RawPacket {
     pub fn read<R>(reader: &mut R) -> io::Result<RawPacket>
