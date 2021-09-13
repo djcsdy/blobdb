@@ -1,5 +1,7 @@
+pub const BLOCK_SIGNATURE_SIZE: usize = 4;
+
 #[derive(Copy, Clone)]
-pub struct BlockSignature<'a>(pub &'a [u8; 4]);
+pub struct BlockSignature<'a>(pub &'a [u8; BLOCK_SIGNATURE_SIZE]);
 
 #[derive(Copy, Clone, Eq, PartialEq)]
 pub enum BlockArity {
@@ -26,8 +28,8 @@ impl BlockSignature<'_> {
     }
 }
 
-impl<'a> AsRef<[u8; 4]> for BlockSignature<'a> {
-    fn as_ref(&self) -> &'a [u8; 4] {
+impl<'a> AsRef<[u8; BLOCK_SIGNATURE_SIZE]> for BlockSignature<'a> {
+    fn as_ref(&self) -> &'a [u8; BLOCK_SIGNATURE_SIZE] {
         self.0
     }
 }
