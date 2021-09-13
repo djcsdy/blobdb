@@ -1,4 +1,5 @@
 use crate::lib::blob::BlobId;
+use crate::lib::packet::packet::MAX_PACKET_SIZE;
 use crate::lib::packet::RawPacket;
 use arrayref::array_ref;
 use byteorder::{ByteOrder, LittleEndian};
@@ -76,7 +77,7 @@ impl<R: Read> Iterator for ImportBlobDataPackets<R> {
         }
 
         let offset = self.offset;
-        let mut buf = [0 as u8; 4004];
+        let mut buf = [0 as u8; MAX_PACKET_SIZE];
         let mut pos = 0;
         loop {
             match self.tee_reader.read(&mut buf[pos..]) {
