@@ -7,6 +7,8 @@ use sha2::{Digest, Sha256};
 use std::io::{ErrorKind, Read, Result};
 use tee_readwrite::TeeReader;
 
+pub const BLOB_DATA_PACKET_TYPE_ID: u8 = 1;
+
 const OFFSET_SIZE: usize = 8;
 pub const MAX_DATA_SIZE: usize = MAX_PACKET_SIZE - DATA_OFFSET;
 

@@ -1,4 +1,5 @@
 use crate::lib::block::ONE_PACKET_MAX_SIZE;
+use crate::lib::packet::blob_data::BLOB_DATA_PACKET_TYPE_ID;
 use crate::lib::packet::invalid::InvalidPacket;
 use crate::lib::packet::{BlobDataPacket, RawPacket};
 
@@ -30,7 +31,7 @@ impl AsRef<[u8]> for Packet {
 impl From<RawPacket> for Packet {
     fn from(raw: RawPacket) -> Self {
         match raw.type_id() {
-            1 => Packet::BlobData(BlobDataPacket(raw)),
+            BLOB_DATA_PACKET_TYPE_ID => Packet::BlobData(BlobDataPacket(raw)),
             _ => Packet::Invalid(InvalidPacket(raw)),
         }
     }
