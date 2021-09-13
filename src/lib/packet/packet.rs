@@ -29,7 +29,7 @@ impl AsRef<[u8]> for Packet {
 
 impl From<RawPacket> for Packet {
     fn from(raw: RawPacket) -> Self {
-        match raw.as_ref()[1] >> 4 {
+        match raw.type_id() {
             1 => Packet::BlobData(BlobDataPacket(raw)),
             _ => Packet::Invalid(InvalidPacket(raw)),
         }

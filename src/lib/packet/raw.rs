@@ -2,7 +2,7 @@ use std::io;
 use std::io::{Error, ErrorKind, Read};
 use std::mem::size_of;
 
-use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
+use byteorder::{ByteOrder, LittleEndian, ReadBytesExt, WriteBytesExt};
 
 use crate::lib::packet::blob_data::BlobDataPacket;
 use crate::lib::packet::invalid::InvalidPacket;
@@ -40,6 +40,18 @@ impl RawPacket {
 
     pub fn new_invalid() -> RawPacket {
         RawPacket(vec![])
+    }
+
+    fn type_id_and_length(&self) -> u16 {
+        if self.0.len() >= TYPE_ID_AND_LENGTH_END {
+            LittleEndian::read_u16(&self.0[TYPE_ID_AND_LENGTH_OFFSET..TYPE_ID_AND_LENGTH_END])
+        } else {
+            0
+        }
+    }
+
+    pub fn type_id(&self) -> u8 {
+        (self.type_id_and_length() >> 12) as u8
     }
 
     pub fn size(&self) -> usize {
