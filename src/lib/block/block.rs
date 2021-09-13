@@ -21,6 +21,7 @@ const DB_ID_END: usize = DB_ID_OFFSET + DB_ID_SIZE;
 const DIGEST_OFFSET: usize = DB_ID_END;
 const DIGEST_END: usize = DIGEST_OFFSET + BLOCK_DIGEST_SIZE;
 const PAYLOAD_OFFSET: usize = DIGEST_END;
+const PACKET_COUNT_OFFSET: usize = PAYLOAD_OFFSET;
 
 #[derive(Clone)]
 pub struct Block(pub(super) [u8; BLOCK_SIZE]);
