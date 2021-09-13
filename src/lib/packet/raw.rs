@@ -12,7 +12,7 @@ const TYPE_ID_AND_LENGTH_SIZE: usize = size_of::<u16>();
 
 const TYPE_ID_AND_LENGTH_OFFSET: usize = 0;
 const TYPE_ID_AND_LENGTH_END: usize = TYPE_ID_AND_LENGTH_OFFSET + TYPE_ID_AND_LENGTH_SIZE;
-const BODY_OFFSET: usize = TYPE_ID_AND_LENGTH_END;
+const DATA_OFFSET: usize = TYPE_ID_AND_LENGTH_END;
 
 pub struct RawPacket(pub(super) Vec<u8>);
 
@@ -29,11 +29,11 @@ impl RawPacket {
             return Err(Error::from(ErrorKind::InvalidData));
         }
 
-        let mut raw_bytes = Vec::with_capacity(length as usize + BODY_OFFSET);
+        let mut raw_bytes = Vec::with_capacity(length as usize + DATA_OFFSET);
         raw_bytes
             .write_u16::<LittleEndian>(type_id_and_length)
             .unwrap();
-        reader.read_exact(&mut raw_bytes[BODY_OFFSET..])?;
+        reader.read_exact(&mut raw_bytes[DATA_OFFSET..])?;
 
         Ok(RawPacket(raw_bytes))
     }
@@ -52,6 +52,10 @@ impl RawPacket {
 
     pub fn type_id(&self) -> u8 {
         (self.type_id_and_length() >> 12) as u8
+    }
+
+    pub fn data(&self) -> &[u8] {
+        &self.0[DATA_OFFSET..]
     }
 
     pub fn size(&self) -> usize {
