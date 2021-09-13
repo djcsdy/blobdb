@@ -1,5 +1,5 @@
 use crate::lib::blob::{BlobId, BLOB_ID_SIZE};
-use crate::lib::packet::raw::MAX_PACKET_SIZE;
+use crate::lib::packet::raw::{MAX_PACKET_SIZE, MAX_PAYLOAD_SIZE};
 use crate::lib::packet::RawPacket;
 use arrayref::array_ref;
 use byteorder::{ByteOrder, LittleEndian};
@@ -10,7 +10,7 @@ use tee_readwrite::TeeReader;
 pub const BLOB_DATA_PACKET_TYPE_ID: u8 = 1;
 
 const OFFSET_SIZE: usize = 8;
-pub const MAX_DATA_SIZE: usize = MAX_PACKET_SIZE - DATA_OFFSET;
+pub const MAX_DATA_SIZE: usize = MAX_PAYLOAD_SIZE - DATA_OFFSET;
 
 const BLOB_ID_OFFSET: usize = 0;
 const BLOB_ID_END: usize = BLOB_ID_OFFSET + BLOB_ID_SIZE;
@@ -28,12 +28,12 @@ impl AsRef<[u8]> for BlobDataPacket {
 
 impl BlobDataPacket {
     pub fn new(blob_id: BlobId, offset: u64, data: Vec<u8>) -> BlobDataPacket {
-        let mut raw_bytes = Vec::with_capacity(data.len() + DATA_OFFSET);
-        raw_bytes[BLOB_ID_OFFSET..BLOB_ID_SIZE].copy_from_slice(&blob_id.0);
-        LittleEndian::write_u64(&mut raw_bytes[OFFSET_OFFSET..OFFSET_END], offset);
-        raw_bytes[DATA_OFFSET..].copy_from_slice(&data);
+        let mut payload_bytes = Vec::with_capacity(data.len() + DATA_OFFSET);
+        payload_bytes[BLOB_ID_OFFSET..BLOB_ID_SIZE].copy_from_slice(&blob_id.0);
+        LittleEndian::write_u64(&mut payload_bytes[OFFSET_OFFSET..OFFSET_END], offset);
+        payload_bytes[DATA_OFFSET..].copy_from_slice(&data);
 
-        BlobDataPacket(RawPacket(raw_bytes))
+        BlobDataPacket(RawPacket::new(BLOB_DATA_PACKET_TYPE_ID, &payload_bytes))
     }
 
     fn new_anonymous(offset: u64, data: Vec<u8>) -> BlobDataPacket {
@@ -45,15 +45,15 @@ impl BlobDataPacket {
     }
 
     pub fn blob_id(&self) -> BlobId {
-        BlobId(array_ref!(self.as_ref(), BLOB_ID_OFFSET, BLOB_ID_SIZE).clone())
+        BlobId(array_ref!(self.0.payload(), BLOB_ID_OFFSET, BLOB_ID_SIZE).clone())
     }
 
     pub fn offset(&self) -> u64 {
-        LittleEndian::read_u64(array_ref!(self.as_ref(), OFFSET_OFFSET, OFFSET_SIZE))
+        LittleEndian::read_u64(array_ref!(self.0.payload(), OFFSET_OFFSET, OFFSET_SIZE))
     }
 
     pub fn data(&self) -> &[u8] {
-        &self.as_ref()[DATA_OFFSET..]
+        &self.0.payload()[DATA_OFFSET..]
     }
 
     pub fn import_blob<R: Read>(reader: R) -> ImportBlobDataPackets<R> {
