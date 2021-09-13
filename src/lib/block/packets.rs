@@ -28,12 +28,11 @@ impl Iterator for Packets {
             self.count -= 1;
             let mut buffer = &self.block.raw_packets_bytes()[self.pos..];
             let remaining = buffer.len();
-            let raw_packet = RawPacket::read(&mut buffer);
+            let raw_packet =
+                RawPacket::read(&mut buffer).unwrap_or_else(|_| RawPacket::new_invalid());
             self.pos += buffer.len() - remaining;
 
-            Some(Packet::from(
-                raw_packet.unwrap_or_else(|_| RawPacket::new_invalid()),
-            ))
+            Some(Packet::from(raw_packet))
         }
     }
 
