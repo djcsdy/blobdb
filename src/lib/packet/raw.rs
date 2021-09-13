@@ -11,6 +11,7 @@ use crate::lib::packet::packet::Packet;
 
 pub const MAX_PACKET_SIZE: usize = ONE_PACKET_MAX_SIZE;
 const TYPE_ID_AND_LENGTH_SIZE: usize = size_of::<u16>();
+pub const MAX_DATA_SIZE: usize = MAX_PACKET_SIZE - DATA_OFFSET;
 
 const TYPE_ID_AND_LENGTH_OFFSET: usize = 0;
 const TYPE_ID_AND_LENGTH_END: usize = TYPE_ID_AND_LENGTH_OFFSET + TYPE_ID_AND_LENGTH_SIZE;
