@@ -4,6 +4,7 @@ use std::io::{Error, ErrorKind, Read};
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 
 use crate::lib::packet::blob_data::BlobDataPacket;
+use crate::lib::packet::invalid::InvalidPacket;
 use crate::lib::packet::packet::Packet;
 
 pub struct RawPacket(pub(super) Vec<u8>);
@@ -49,6 +50,7 @@ impl From<Packet> for RawPacket {
     fn from(packet: Packet) -> Self {
         match packet {
             Packet::BlobData(BlobDataPacket(raw_packet)) => raw_packet,
+            Packet::Invalid(InvalidPacket(raw_packet)) => raw_packet,
         }
     }
 }

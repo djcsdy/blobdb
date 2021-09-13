@@ -1,13 +1,16 @@
+use crate::lib::packet::invalid::InvalidPacket;
 use crate::lib::packet::{BlobDataPacket, RawPacket};
 
 pub enum Packet {
     BlobData(BlobDataPacket),
+    Invalid(InvalidPacket),
 }
 
 impl Packet {
     pub fn size(&self) -> usize {
         match self {
             Packet::BlobData(packet) => packet.size(),
+            Packet::Invalid(packet) => packet.size(),
         }
     }
 }
@@ -16,6 +19,7 @@ impl AsRef<[u8]> for Packet {
     fn as_ref(&self) -> &[u8] {
         match self {
             Packet::BlobData(packet) => packet.as_ref(),
+            Packet::Invalid(packet) => packet.as_ref(),
         }
     }
 }
@@ -24,7 +28,7 @@ impl From<RawPacket> for Packet {
     fn from(raw: RawPacket) -> Self {
         match raw.as_ref()[1] >> 4 {
             1 => Packet::BlobData(BlobDataPacket(raw)),
-            _ => panic!(),
+            _ => Packet::Invalid(InvalidPacket(raw)),
         }
     }
 }
@@ -32,5 +36,11 @@ impl From<RawPacket> for Packet {
 impl From<BlobDataPacket> for Packet {
     fn from(packet: BlobDataPacket) -> Self {
         Packet::BlobData(packet)
+    }
+}
+
+impl From<InvalidPacket> for Packet {
+    fn from(packet: InvalidPacket) -> Self {
+        Packet::Invalid(packet)
     }
 }
