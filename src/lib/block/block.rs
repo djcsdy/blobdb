@@ -12,6 +12,7 @@ use crate::lib::packet::Packet;
 use crate::lib::packet::RawPacket;
 
 pub const BLOCK_SIZE: usize = 4096;
+const PAYLOAD_SIZE: usize = BLOCK_SIZE - PAYLOAD_OFFSET;
 
 const SIGNATURE_OFFSET: usize = 0;
 const SIGNATURE_END: usize = SIGNATURE_OFFSET + BLOCK_SIGNATURE_SIZE;
@@ -19,6 +20,7 @@ const DB_ID_OFFSET: usize = SIGNATURE_END;
 const DB_ID_END: usize = DB_ID_OFFSET + DB_ID_SIZE;
 const DIGEST_OFFSET: usize = DB_ID_END;
 const DIGEST_END: usize = DIGEST_OFFSET + BLOCK_DIGEST_SIZE;
+const PAYLOAD_OFFSET: usize = DIGEST_END;
 
 #[derive(Clone)]
 pub struct Block(pub(super) [u8; BLOCK_SIZE]);
@@ -75,6 +77,10 @@ impl Block {
 
     fn digest(&self) -> BlockDigest {
         BlockDigest(array_ref!(self.0, DIGEST_OFFSET, BLOCK_DIGEST_SIZE).clone())
+    }
+
+    pub(super) fn payload(&self) -> &[u8; PAYLOAD_SIZE] {
+        array_ref!(self.0, PAYLOAD_OFFSET, PAYLOAD_SIZE)
     }
 
     pub fn into_packets(self) -> Packets {

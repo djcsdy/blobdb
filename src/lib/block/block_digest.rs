@@ -10,7 +10,7 @@ impl BlockDigest {
     pub fn digest_block(block: &Block) -> BlockDigest {
         let mut digest = Sha256::new();
         digest.update(&block.db_id());
-        digest.update(&block.0[52..]);
+        digest.update(block.payload());
         BlockDigest(digest.finalize().into())
     }
 }
