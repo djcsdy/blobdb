@@ -1,5 +1,5 @@
 use std::io;
-use std::io::{Error, ErrorKind, Read};
+use std::io::Read;
 use std::mem::size_of;
 
 use byteorder::{ByteOrder, LittleEndian, ReadBytesExt, WriteBytesExt};
@@ -22,12 +22,7 @@ impl RawPacket {
         R: Read,
     {
         let type_id_and_length = reader.read_u16::<LittleEndian>()?;
-        let type_id = (type_id_and_length >> 12) as u8;
         let length = type_id_and_length & 0xfff;
-
-        if type_id != 1 {
-            return Err(Error::from(ErrorKind::InvalidData));
-        }
 
         let mut raw_bytes = Vec::with_capacity(length as usize + DATA_OFFSET);
         raw_bytes
