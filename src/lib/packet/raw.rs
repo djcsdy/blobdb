@@ -1,11 +1,18 @@
 use std::io;
 use std::io::{Error, ErrorKind, Read};
+use std::mem::size_of;
 
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 
 use crate::lib::packet::blob_data::BlobDataPacket;
 use crate::lib::packet::invalid::InvalidPacket;
 use crate::lib::packet::packet::Packet;
+
+const TYPE_ID_AND_LENGTH_SIZE: usize = size_of::<u16>();
+
+const TYPE_ID_AND_LENGTH_OFFSET: usize = 0;
+const TYPE_ID_AND_LENGTH_END: usize = TYPE_ID_AND_LENGTH_OFFSET + TYPE_ID_AND_LENGTH_SIZE;
+const BODY_OFFSET: usize = TYPE_ID_AND_LENGTH_END;
 
 pub struct RawPacket(pub(super) Vec<u8>);
 
@@ -22,11 +29,11 @@ impl RawPacket {
             return Err(Error::from(ErrorKind::InvalidData));
         }
 
-        let mut raw_bytes = Vec::with_capacity(length as usize + 2);
+        let mut raw_bytes = Vec::with_capacity(length as usize + BODY_OFFSET);
         raw_bytes
             .write_u16::<LittleEndian>(type_id_and_length)
             .unwrap();
-        reader.read_exact(&mut raw_bytes[2..])?;
+        reader.read_exact(&mut raw_bytes[BODY_OFFSET..])?;
 
         Ok(RawPacket(raw_bytes))
     }
