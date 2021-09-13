@@ -22,6 +22,8 @@ const DIGEST_OFFSET: usize = DB_ID_END;
 const DIGEST_END: usize = DIGEST_OFFSET + BLOCK_DIGEST_SIZE;
 const PAYLOAD_OFFSET: usize = DIGEST_END;
 const PACKET_COUNT_OFFSET: usize = PAYLOAD_OFFSET;
+const ONE_PACKET_OFFSET: usize = PAYLOAD_OFFSET;
+const MANY_PACKETS_OFFSET: usize = PACKET_COUNT_OFFSET + 1;
 
 #[derive(Clone)]
 pub struct Block(pub(super) [u8; BLOCK_SIZE]);
@@ -30,9 +32,9 @@ impl Block {
     pub fn new<P: Into<Packet>>(db_id: DbId, packets: Vec<P>) -> Block {
         let mut buffer = [0; BLOCK_SIZE];
 
-        let (arity, packets_start) = match packets.len() {
-            1 => (BlockArity::OnePacket, 52),
-            _ => (BlockArity::ManyPackets, 53),
+        let (arity, packets_offset) = match packets.len() {
+            1 => (BlockArity::OnePacket, ONE_PACKET_OFFSET),
+            _ => (BlockArity::ManyPackets, MANY_PACKETS_OFFSET),
         };
 
         buffer[SIGNATURE_OFFSET..SIGNATURE_END]
@@ -41,11 +43,11 @@ impl Block {
         buffer[DB_ID_OFFSET..DB_ID_END].copy_from_slice(db_id.as_ref());
 
         if arity == BlockArity::ManyPackets {
-            buffer[52] = u8::try_from(packets.len()).unwrap()
+            buffer[PACKET_COUNT_OFFSET] = u8::try_from(packets.len()).unwrap()
         }
 
         {
-            let mut packets_buffer = &mut buffer[packets_start..];
+            let mut packets_buffer = &mut buffer[packets_offset..];
             for packet in packets {
                 packets_buffer
                     .write(RawPacket::from(P::into(packet)).as_ref())
@@ -86,9 +88,9 @@ impl Block {
 
     pub fn into_packets(self) -> Packets {
         let (start, count) = match self.arity() {
-            BlockArity::Invalid => (52, 0),
-            BlockArity::OnePacket => (52, 1),
-            BlockArity::ManyPackets => (53, 1),
+            BlockArity::Invalid => (ONE_PACKET_OFFSET, 0),
+            BlockArity::OnePacket => (ONE_PACKET_OFFSET, 1),
+            BlockArity::ManyPackets => (MANY_PACKETS_OFFSET, 1),
         };
         Packets::new(self, start, count)
     }
