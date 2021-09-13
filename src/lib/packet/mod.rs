@@ -3,6 +3,7 @@ pub use packet::Packet;
 pub use raw::RawPacket;
 
 mod blob_data;
+mod draft_blob_data;
 mod invalid;
 mod packet;
 mod raw;
