@@ -9,8 +9,12 @@ pub struct Packets {
 }
 
 impl Packets {
-    pub(super) fn new(block: Block, pos: usize, count: u8) -> Packets {
-        Packets { block, pos, count }
+    pub(super) fn new(block: Block) -> Packets {
+        Packets {
+            count: block.packet_count(),
+            block,
+            pos: 0,
+        }
     }
 }
 
@@ -22,7 +26,7 @@ impl Iterator for Packets {
             None
         } else {
             self.count -= 1;
-            let mut buffer = &self.block.0[self.pos..];
+            let mut buffer = &self.block.raw_packets_bytes()[self.pos..];
             let remaining = buffer.len();
             let raw_packet = RawPacket::read(&mut buffer);
             self.pos += buffer.len() - remaining;

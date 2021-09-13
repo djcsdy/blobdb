@@ -12,7 +12,6 @@ use crate::lib::packet::Packet;
 use crate::lib::packet::RawPacket;
 
 pub const BLOCK_SIZE: usize = 4096;
-const PAYLOAD_SIZE: usize = BLOCK_SIZE - PAYLOAD_OFFSET;
 pub const ONE_PACKET_MAX_SIZE: usize = BLOCK_SIZE - ONE_PACKET_OFFSET;
 pub const MANY_PACKETS_MAX_SIZE: usize = BLOCK_SIZE - MANY_PACKETS_OFFSET;
 
@@ -22,9 +21,8 @@ const DB_ID_OFFSET: usize = SIGNATURE_END;
 const DB_ID_END: usize = DB_ID_OFFSET + DB_ID_SIZE;
 const DIGEST_OFFSET: usize = DB_ID_END;
 const DIGEST_END: usize = DIGEST_OFFSET + BLOCK_DIGEST_SIZE;
-const PAYLOAD_OFFSET: usize = DIGEST_END;
-const PACKET_COUNT_OFFSET: usize = PAYLOAD_OFFSET;
-const ONE_PACKET_OFFSET: usize = PAYLOAD_OFFSET;
+const PACKET_COUNT_OFFSET: usize = DIGEST_END;
+const ONE_PACKET_OFFSET: usize = PACKET_COUNT_OFFSET;
 const MANY_PACKETS_OFFSET: usize = PACKET_COUNT_OFFSET + 1;
 
 #[derive(Clone)]
@@ -84,17 +82,26 @@ impl Block {
         BlockDigest(array_ref!(self.0, DIGEST_OFFSET, BLOCK_DIGEST_SIZE).clone())
     }
 
-    pub(super) fn payload(&self) -> &[u8; PAYLOAD_SIZE] {
-        array_ref!(self.0, PAYLOAD_OFFSET, PAYLOAD_SIZE)
+    pub(super) fn packet_count(&self) -> u8 {
+        match self.arity() {
+            BlockArity::Invalid => 0,
+            BlockArity::OnePacket => 1,
+            BlockArity::ManyPackets => self.0[PACKET_COUNT_OFFSET],
+        }
+    }
+
+    pub(super) fn raw_packets_bytes(&self) -> &[u8] {
+        match self.arity() {
+            BlockArity::Invalid => &[],
+            BlockArity::OnePacket => array_ref!(self.0, ONE_PACKET_OFFSET, ONE_PACKET_MAX_SIZE),
+            BlockArity::ManyPackets => {
+                array_ref!(self.0, MANY_PACKETS_OFFSET, MANY_PACKETS_MAX_SIZE)
+            }
+        }
     }
 
     pub fn into_packets(self) -> Packets {
-        let (start, count) = match self.arity() {
-            BlockArity::Invalid => (ONE_PACKET_OFFSET, 0),
-            BlockArity::OnePacket => (ONE_PACKET_OFFSET, 1),
-            BlockArity::ManyPackets => (MANY_PACKETS_OFFSET, 1),
-        };
-        Packets::new(self, start, count)
+        Packets::new(self)
     }
 }
 
