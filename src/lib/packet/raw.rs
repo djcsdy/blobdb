@@ -36,6 +36,20 @@ impl RawPacket {
         Ok(RawPacket(raw_bytes))
     }
 
+    pub fn new(type_id: u8, data: &[u8]) -> RawPacket {
+        if data.len() > MAX_DATA_SIZE {
+            panic!();
+        }
+        let mut raw_bytes = Vec::with_capacity(data.len() + DATA_OFFSET);
+        let type_id_and_length = ((data.len() as u16) & 0xfff) | ((type_id as u16) << 12);
+        LittleEndian::write_u16(
+            &mut raw_bytes[TYPE_ID_AND_LENGTH_OFFSET..TYPE_ID_AND_LENGTH_END],
+            type_id_and_length,
+        );
+        raw_bytes[DATA_OFFSET..].copy_from_slice(data);
+        RawPacket(raw_bytes)
+    }
+
     pub fn new_invalid() -> RawPacket {
         RawPacket(vec![0; DATA_OFFSET])
     }
