@@ -7,6 +7,9 @@ use sha2::{Digest, Sha256};
 use std::io::{ErrorKind, Read, Result};
 use tee_readwrite::TeeReader;
 
+const BLOB_ID_OFFSET: usize = 0;
+const BLOB_ID_END: usize = BLOB_ID_OFFSET + BLOB_ID_SIZE;
+
 pub struct BlobDataPacket(pub(super) RawPacket);
 
 impl AsRef<[u8]> for BlobDataPacket {
@@ -18,7 +21,7 @@ impl AsRef<[u8]> for BlobDataPacket {
 impl BlobDataPacket {
     pub fn new(blob_id: BlobId, offset: u64, data: Vec<u8>) -> BlobDataPacket {
         let mut raw_bytes = Vec::with_capacity(data.len() + 40);
-        raw_bytes[0..BLOB_ID_SIZE].copy_from_slice(&blob_id.0);
+        raw_bytes[BLOB_ID_OFFSET..BLOB_ID_SIZE].copy_from_slice(&blob_id.0);
         LittleEndian::write_u64(&mut raw_bytes[32..40], offset);
         raw_bytes[40..].copy_from_slice(&data);
 
@@ -34,7 +37,7 @@ impl BlobDataPacket {
     }
 
     pub fn blob_id(&self) -> BlobId {
-        BlobId(array_ref!(self.as_ref(), 0, BLOB_ID_SIZE).clone())
+        BlobId(array_ref!(self.as_ref(), BLOB_ID_OFFSET, BLOB_ID_SIZE).clone())
     }
 
     pub fn offset(&self) -> u64 {
