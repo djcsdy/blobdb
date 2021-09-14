@@ -10,8 +10,10 @@ use crate::lib::block::signature::{BlockArity, BlockSignature, BLOCK_SIGNATURE_S
 use crate::lib::db::{DbId, DB_ID_SIZE};
 use crate::lib::packet::Packet;
 use crate::lib::packet::RawPacket;
+use std::mem::size_of;
 
 pub const BLOCK_SIZE: usize = 4096;
+pub const PACKET_COUNT_SIZE: usize = size_of::<u8>();
 pub const ONE_PACKET_MAX_SIZE: usize = BLOCK_SIZE - ONE_PACKET_OFFSET;
 pub const MANY_PACKETS_MAX_SIZE: usize = BLOCK_SIZE - MANY_PACKETS_OFFSET;
 
@@ -23,7 +25,7 @@ const DIGEST_OFFSET: usize = DB_ID_END;
 const DIGEST_END: usize = DIGEST_OFFSET + BLOCK_DIGEST_SIZE;
 const PACKET_COUNT_OFFSET: usize = DIGEST_END;
 const ONE_PACKET_OFFSET: usize = PACKET_COUNT_OFFSET;
-const MANY_PACKETS_OFFSET: usize = PACKET_COUNT_OFFSET + 1;
+const MANY_PACKETS_OFFSET: usize = PACKET_COUNT_OFFSET + PACKET_COUNT_SIZE;
 
 #[derive(Clone)]
 pub struct Block(pub(super) [u8; BLOCK_SIZE]);
