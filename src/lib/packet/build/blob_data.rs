@@ -32,7 +32,8 @@ pub fn build_blob_data(blob_id: BlobId, packet: DraftBlobDataPacket) -> Vec<u8> 
     let mut cursor = Cursor::new(&mut buffer);
     build_write_blob_data(&mut cursor, packet)
         .unwrap()
-        .write_blob_id(&mut cursor, blob_id);
+        .write_blob_id(&mut cursor, blob_id)
+        .unwrap();
     buffer
 }
 
