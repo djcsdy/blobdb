@@ -61,10 +61,7 @@ impl Block {
         Block(buffer)
     }
 
-    pub fn read<R>(reader: &mut R) -> io::Result<Block>
-    where
-        R: Read,
-    {
+    pub fn read<R: Read>(reader: &mut R) -> io::Result<Block> {
         let mut buffer = [0; BLOCK_SIZE];
         reader.read_exact(&mut buffer)?;
         Ok(Block(buffer))
