@@ -1,4 +1,5 @@
 use crate::lib::blob::{BlobId, BLOB_ID_SIZE};
+use crate::lib::packet::build::{build_blob_data, DraftBlobDataPacket};
 use crate::lib::packet::raw::{MAX_PACKET_SIZE, MAX_PAYLOAD_SIZE};
 use crate::lib::packet::RawPacket;
 use arrayref::array_ref;
@@ -28,12 +29,10 @@ impl AsRef<[u8]> for BlobDataPacket {
 
 impl BlobDataPacket {
     pub fn new(blob_id: BlobId, offset: u64, data: Vec<u8>) -> BlobDataPacket {
-        let mut payload_bytes = Vec::with_capacity(data.len() + BLOB_DATA_OFFSET);
-        payload_bytes[BLOB_ID_OFFSET..BLOB_ID_SIZE].copy_from_slice(&blob_id.0);
-        LittleEndian::write_u64(&mut payload_bytes[OFFSET_OFFSET..OFFSET_END], offset);
-        payload_bytes[BLOB_DATA_OFFSET..].copy_from_slice(&data);
-
-        BlobDataPacket(RawPacket::new(BLOB_DATA_PACKET_TYPE_ID, &payload_bytes))
+        BlobDataPacket(RawPacket::new(build_blob_data(
+            blob_id,
+            DraftBlobDataPacket { offset, data },
+        )))
     }
 
     fn new_anonymous(offset: u64, data: Vec<u8>) -> BlobDataPacket {

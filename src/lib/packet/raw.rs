@@ -8,9 +8,7 @@ use crate::lib::block::ONE_PACKET_MAX_SIZE;
 use crate::lib::packet::blob_data::BlobDataPacket;
 use crate::lib::packet::invalid::InvalidPacket;
 use crate::lib::packet::packet::Packet;
-use crate::lib::packet::type_id_and_length::{
-    combine_type_id_and_length, extract_length, extract_type_id,
-};
+use crate::lib::packet::type_id_and_length::{extract_length, extract_type_id};
 
 pub const MAX_PACKET_SIZE: usize = ONE_PACKET_MAX_SIZE;
 const TYPE_ID_AND_LENGTH_SIZE: usize = size_of::<u16>();
@@ -36,17 +34,8 @@ impl RawPacket {
         Ok(RawPacket(raw_bytes))
     }
 
-    pub fn new(type_id: u8, payload: &[u8]) -> RawPacket {
-        if payload.len() > MAX_PAYLOAD_SIZE {
-            panic!();
-        }
-        let mut raw_bytes = Vec::with_capacity(payload.len() + PAYLOAD_OFFSET);
-        LittleEndian::write_u16(
-            &mut raw_bytes[TYPE_ID_AND_LENGTH_OFFSET..TYPE_ID_AND_LENGTH_END],
-            combine_type_id_and_length(type_id, payload.len()),
-        );
-        raw_bytes[PAYLOAD_OFFSET..].copy_from_slice(payload);
-        RawPacket(raw_bytes)
+    pub(super) fn new(buffer: Vec<u8>) -> RawPacket {
+        RawPacket(buffer)
     }
 
     pub fn new_invalid() -> RawPacket {
