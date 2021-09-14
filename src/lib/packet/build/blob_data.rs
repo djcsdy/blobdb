@@ -5,26 +5,21 @@ use byteorder::{LittleEndian, WriteBytesExt};
 
 use crate::lib::blob::BlobId;
 use crate::lib::packet::blob_data::{BLOB_DATA_OFFSET, BLOB_DATA_PACKET_TYPE_ID};
+use crate::lib::packet::build::raw::build_write_raw_packet;
 use crate::lib::packet::build::write_blob_id::WriteBlobId;
-use crate::lib::packet::type_id_and_length::combine_type_id_and_length;
 
-pub fn build_write_blob_data<W>(
-    mut writer: W,
-    packet: DraftBlobDataPacket,
-) -> io::Result<WriteBlobId>
+pub fn build_write_blob_data<W>(writer: W, packet: DraftBlobDataPacket) -> io::Result<WriteBlobId>
 where
     W: Write,
     W: Seek,
 {
-    writer.write_u16::<LittleEndian>(combine_type_id_and_length(
-        BLOB_DATA_PACKET_TYPE_ID,
-        packet.data.len(),
-    ))?;
-    let blob_id_position = writer.stream_position()?;
-    writer.write_all(BlobId::anonymous().as_ref())?;
-    writer.write_u64::<LittleEndian>(packet.offset)?;
-    writer.write_all(&packet.data)?;
-    Ok(WriteBlobId::new(blob_id_position))
+    build_write_raw_packet(writer, BLOB_DATA_PACKET_TYPE_ID, |writer| {
+        let blob_id_position = writer.stream_position()?;
+        writer.write_all(BlobId::anonymous().as_ref())?;
+        writer.write_u64::<LittleEndian>(packet.offset)?;
+        writer.write_all(&packet.data)?;
+        Ok(WriteBlobId::new(blob_id_position))
+    })
 }
 
 pub fn build_blob_data(blob_id: BlobId, packet: DraftBlobDataPacket) -> Vec<u8> {
