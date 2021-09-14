@@ -4,7 +4,7 @@ use std::io::{Cursor, Seek, Write};
 use byteorder::{LittleEndian, WriteBytesExt};
 
 use crate::lib::blob::BlobId;
-use crate::lib::packet::blob_data::{BLOB_DATA_OFFSET, BLOB_DATA_PACKET_TYPE_ID};
+use crate::lib::packet::blob_data::{BLOB_DATA_OFFSET, BLOB_DATA_PACKET_TYPE_ID, MAX_DATA_SIZE};
 use crate::lib::packet::build::raw::build_write_raw_packet;
 use crate::lib::packet::build::write_blob_id::WriteBlobId;
 
@@ -13,6 +13,9 @@ where
     W: Write,
     W: Seek,
 {
+    if packet.data.len() > MAX_DATA_SIZE {
+        panic!();
+    }
     build_write_raw_packet(writer, BLOB_DATA_PACKET_TYPE_ID, |writer| {
         let blob_id_position = writer.stream_position()?;
         writer.write_all(BlobId::anonymous().as_ref())?;
