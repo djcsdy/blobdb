@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 pub use db::Db;
 
 mod blob;
