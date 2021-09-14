@@ -8,6 +8,9 @@ use crate::lib::block::ONE_PACKET_MAX_SIZE;
 use crate::lib::packet::blob_data::BlobDataPacket;
 use crate::lib::packet::invalid::InvalidPacket;
 use crate::lib::packet::packet::Packet;
+use crate::lib::packet::type_id_and_length::{
+    combine_type_id_and_length, extract_length, extract_type_id,
+};
 
 pub const MAX_PACKET_SIZE: usize = ONE_PACKET_MAX_SIZE;
 const TYPE_ID_AND_LENGTH_SIZE: usize = size_of::<u16>();
@@ -25,7 +28,7 @@ impl RawPacket {
         R: Read,
     {
         let type_id_and_length = reader.read_u16::<LittleEndian>()?;
-        let length = type_id_and_length & 0xfff;
+        let length = extract_length(type_id_and_length);
 
         let mut raw_bytes = Vec::with_capacity(length as usize + PAYLOAD_OFFSET);
         raw_bytes
@@ -41,10 +44,9 @@ impl RawPacket {
             panic!();
         }
         let mut raw_bytes = Vec::with_capacity(payload.len() + PAYLOAD_OFFSET);
-        let type_id_and_length = ((payload.len() as u16) & 0xfff) | ((type_id as u16) << 12);
         LittleEndian::write_u16(
             &mut raw_bytes[TYPE_ID_AND_LENGTH_OFFSET..TYPE_ID_AND_LENGTH_END],
-            type_id_and_length,
+            combine_type_id_and_length(type_id, payload.len()),
         );
         raw_bytes[PAYLOAD_OFFSET..].copy_from_slice(payload);
         RawPacket(raw_bytes)
@@ -59,7 +61,7 @@ impl RawPacket {
     }
 
     pub fn type_id(&self) -> u8 {
-        (self.type_id_and_length() >> 12) as u8
+        extract_type_id(self.type_id_and_length())
     }
 
     pub fn payload(&self) -> &[u8] {

@@ -10,13 +10,13 @@ use tee_readwrite::TeeReader;
 pub const BLOB_DATA_PACKET_TYPE_ID: u8 = 1;
 
 const OFFSET_SIZE: usize = 8;
-pub const MAX_DATA_SIZE: usize = MAX_PAYLOAD_SIZE - DATA_OFFSET;
+pub const MAX_DATA_SIZE: usize = MAX_PAYLOAD_SIZE - BLOB_DATA_OFFSET;
 
 const BLOB_ID_OFFSET: usize = 0;
 const BLOB_ID_END: usize = BLOB_ID_OFFSET + BLOB_ID_SIZE;
 const OFFSET_OFFSET: usize = BLOB_ID_END;
 const OFFSET_END: usize = OFFSET_OFFSET + OFFSET_SIZE;
-const DATA_OFFSET: usize = OFFSET_END;
+pub(super) const BLOB_DATA_OFFSET: usize = OFFSET_END;
 
 pub struct BlobDataPacket(pub(super) RawPacket);
 
@@ -28,16 +28,16 @@ impl AsRef<[u8]> for BlobDataPacket {
 
 impl BlobDataPacket {
     pub fn new(blob_id: BlobId, offset: u64, data: Vec<u8>) -> BlobDataPacket {
-        let mut payload_bytes = Vec::with_capacity(data.len() + DATA_OFFSET);
+        let mut payload_bytes = Vec::with_capacity(data.len() + BLOB_DATA_OFFSET);
         payload_bytes[BLOB_ID_OFFSET..BLOB_ID_SIZE].copy_from_slice(&blob_id.0);
         LittleEndian::write_u64(&mut payload_bytes[OFFSET_OFFSET..OFFSET_END], offset);
-        payload_bytes[DATA_OFFSET..].copy_from_slice(&data);
+        payload_bytes[BLOB_DATA_OFFSET..].copy_from_slice(&data);
 
         BlobDataPacket(RawPacket::new(BLOB_DATA_PACKET_TYPE_ID, &payload_bytes))
     }
 
     fn new_anonymous(offset: u64, data: Vec<u8>) -> BlobDataPacket {
-        BlobDataPacket::new(BlobId([0; BLOB_ID_SIZE]), offset, data)
+        BlobDataPacket::new(BlobId::anonymous(), offset, data)
     }
 
     pub fn size(&self) -> usize {
@@ -53,7 +53,7 @@ impl BlobDataPacket {
     }
 
     pub fn data(&self) -> &[u8] {
-        &self.0.payload()[DATA_OFFSET..]
+        &self.0.payload()[BLOB_DATA_OFFSET..]
     }
 
     pub fn import_blob<R: Read>(reader: R) -> ImportBlobDataPackets<R> {

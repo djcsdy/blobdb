@@ -6,6 +6,10 @@ pub const BLOB_ID_SIZE: usize = 32;
 pub struct BlobId(pub [u8; BLOB_ID_SIZE]);
 
 impl BlobId {
+    pub fn anonymous() -> BlobId {
+        BlobId([0; BLOB_ID_SIZE])
+    }
+
     pub fn name(&self) -> PathBuf {
         hex::encode(self.0).into()
     }
