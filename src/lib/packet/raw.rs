@@ -23,10 +23,7 @@ const PAYLOAD_OFFSET: usize = TYPE_ID_AND_LENGTH_END;
 pub struct RawPacket(Vec<u8>);
 
 impl RawPacket {
-    pub fn read<R>(reader: &mut R) -> io::Result<RawPacket>
-    where
-        R: Read,
-    {
+    pub fn read<R: Read>(reader: &mut R) -> io::Result<RawPacket> {
         let type_id_and_length = reader.read_u16::<LittleEndian>()?;
         let length = extract_length(type_id_and_length);
 
