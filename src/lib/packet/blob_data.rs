@@ -1,7 +1,7 @@
 use crate::lib::blob::{BlobId, BLOB_ID_SIZE};
 use crate::lib::io::ReadExt;
 use crate::lib::packet::build::{build_blob_data, DraftBlobDataPacket};
-use crate::lib::packet::packetizer::{Packetized, Packetizer};
+use crate::lib::packet::packetizer::{Packetized, Packetizer, PacketizerPostUpdater};
 use crate::lib::packet::raw::{MAX_PAYLOAD_SIZE, PAYLOAD_OFFSET};
 use crate::lib::packet::{Packet, RawPacket};
 use arrayref::array_ref;
@@ -51,6 +51,10 @@ impl BlobDataPacket {
         BlobId(*array_ref!(self.0.payload(), BLOB_ID_OFFSET, BLOB_ID_SIZE))
     }
 
+    pub fn with_blob_id(&self, blob_id: BlobId) -> BlobDataPacket {
+        BlobDataPacket::new(blob_id, self.offset(), self.data().into())
+    }
+
     pub fn offset(&self) -> u64 {
         LittleEndian::read_u64(array_ref!(self.0.payload(), OFFSET_OFFSET, OFFSET_SIZE))
     }
@@ -74,7 +78,7 @@ pub struct ImportBlobDataPackets<R: Read> {
     end: bool,
 }
 
-impl<R: Read> Packetizer<()> for ImportBlobDataPackets<R> {
+impl<R: Read> Packetizer<(), ImportBlobDataPostUpdater> for ImportBlobDataPackets<R> {
     fn next_packet(&mut self, max_size: u16) -> Packetized<()> {
         if self.end {
             return Packetized::End;
@@ -93,17 +97,23 @@ impl<R: Read> Packetizer<()> for ImportBlobDataPackets<R> {
         }
     }
 
-    fn apply_post_update(&mut self, packet: &mut Packet, _: ()) {
-        match packet {
-            Packet::BlobData(packet) => todo!("set blob_id"),
-            _ => panic!(),
+    fn into_post_updater(self) -> ImportBlobDataPostUpdater {
+        let (_, digest) = self.tee_reader.into_inner();
+        ImportBlobDataPostUpdater {
+            blob_id: BlobId(digest.finalize().into()),
         }
     }
 }
 
-// impl<R: Read> ImportBlobDataPackets<R> {
-//     pub fn end_and_digest_id(self) -> BlobId {
-//         let (_, digest) = self.tee_reader.into_inner();
-//         BlobId(digest.finalize().into())
-//     }
-// }
+pub struct ImportBlobDataPostUpdater {
+    blob_id: BlobId,
+}
+
+impl PacketizerPostUpdater<()> for ImportBlobDataPostUpdater {
+    fn apply_post_update(&mut self, packet: &Packet, _: ()) -> Packet {
+        match packet {
+            Packet::BlobData(packet) => packet.with_blob_id(self.blob_id).into(),
+            _ => panic!(),
+        }
+    }
+}
