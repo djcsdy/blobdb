@@ -93,7 +93,7 @@ impl<R: Read> Packetizer<()> for ImportBlobDataPackets<R> {
         }
     }
 
-    fn apply_post_update(&mut self, packet: &mut Packet, _: ()) -> () {
+    fn apply_post_update(&mut self, packet: &mut Packet, _: ()) {
         match packet {
             Packet::BlobData(packet) => todo!("set blob_id"),
             _ => panic!(),

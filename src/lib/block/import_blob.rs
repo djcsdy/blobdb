@@ -20,7 +20,7 @@ impl<R: Read> Blockifier<()> for ImportBlobDataBlocks<R> {
         todo!()
     }
 
-    fn apply_post_update(&mut self, block: &mut Block, post_update: ()) -> () {
+    fn apply_post_update(&mut self, block: &mut Block, post_update: ()) {
         todo!()
     }
 }
