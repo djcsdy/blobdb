@@ -1,23 +1,33 @@
 use std::io::{Result, Seek, Write};
 
 pub trait PacketProvider<W: Write + Seek> {
-    fn next_large_packet(&mut self) -> Result<LargePacketResult>;
-    fn next_packet(&mut self, max_size: usize) -> Result<PacketResult>;
-}
-
-pub enum LargePacketResult {
-    LargePacket(WritePacket),
-    TooSmall,
-    End,
+    fn next_packet(&mut self, max_size: u16) -> Result<PacketResult>;
 }
 
 pub enum PacketResult {
-    Packet(WritePacket),
-    TooBig,
+    WritePacket(WritePacket),
+    PacketTooBig,
     End,
 }
 
-pub type WritePacket = Box<dyn FnOnce(&mut dyn WriteSeek) -> Result<()>>;
+pub struct WritePacket {
+    size: u16,
+    write: Box<dyn FnOnce(&mut dyn WriteSeek) -> Result<()>>,
+}
+
+impl WritePacket {
+    pub fn new(size: u16, write: Box<dyn FnOnce(&mut dyn WriteSeek) -> Result<()>>) -> WritePacket {
+        WritePacket { size, write }
+    }
+
+    pub fn size(&self) -> u16 {
+        self.size
+    }
+
+    pub fn write(self, writer: &mut dyn WriteSeek) -> Result<()> {
+        (self.write)(writer)
+    }
+}
 
 pub trait WriteSeek: Write + Seek {}
 

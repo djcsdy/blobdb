@@ -10,6 +10,7 @@ use crate::lib::packet::invalid::InvalidPacket;
 use crate::lib::packet::packet::Packet;
 use crate::lib::packet::type_id_and_length::{extract_length, extract_type_id};
 
+pub const MIN_PACKET_SIZE: usize = PAYLOAD_OFFSET;
 pub const MAX_PACKET_SIZE: usize = ONE_PACKET_MAX_SIZE;
 const TYPE_ID_AND_LENGTH_SIZE: usize = size_of::<u16>();
 pub const MAX_PAYLOAD_SIZE: usize = MAX_PACKET_SIZE - PAYLOAD_OFFSET;

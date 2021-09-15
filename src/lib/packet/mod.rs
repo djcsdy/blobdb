@@ -1,6 +1,6 @@
 pub use blob_data::{BlobDataPacket, ImportBlobDataPackets};
 pub use packet::Packet;
-pub use raw::RawPacket;
+pub use raw::{RawPacket, MIN_PACKET_SIZE};
 
 mod blob_data;
 mod build;

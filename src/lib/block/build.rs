@@ -1,84 +1,90 @@
 use crate::lib::block::block::MANY_PACKETS_MAX_SIZE;
 use crate::lib::block::block_digest::BLOCK_DIGEST_SIZE;
-use crate::lib::block::packet_provider::{LargePacketResult, PacketProvider, PacketResult};
-use crate::lib::block::signature::{BlockArity, BlockSignature};
+use crate::lib::block::packet_provider::{PacketProvider, PacketResult};
+use crate::lib::block::signature::{BlockArity, BlockSignature, BLOCK_SIGNATURE_SIZE};
 use crate::lib::block::ONE_PACKET_MAX_SIZE;
 use crate::lib::db::DbId;
+use crate::lib::packet::MIN_PACKET_SIZE;
 use byteorder::WriteBytesExt;
-use std::io::{BufWriter, Result, Seek, Write};
+use std::io::{BufWriter, Result, Seek, SeekFrom, Write};
 
 pub fn build_write_block<W: Write + Seek>(
     writer: &mut BufWriter<W>,
     db_id: &DbId,
     packet_provider: &mut dyn PacketProvider<&mut BufWriter<W>>,
 ) -> Result<BuildWriteBlockResult> {
-    let write_large_packet = match packet_provider.next_large_packet()? {
-        LargePacketResult::LargePacket(writer) => Some(writer),
-        LargePacketResult::TooSmall => None,
-        LargePacketResult::End => return Ok(BuildWriteBlockResult::Done),
+    let mut packet = packet_provider.next_packet(ONE_PACKET_MAX_SIZE as u16)?;
+
+    let one_packet = match &packet {
+        PacketResult::WritePacket(write_packet) => {
+            write_packet.size() == ONE_PACKET_MAX_SIZE as u16
+        }
+        PacketResult::PacketTooBig => panic!(),
+        PacketResult::End => return Ok(BuildWriteBlockResult::Done),
     };
 
-    let arity = match write_large_packet {
-        None => BlockArity::ManyPackets,
-        Some(_) => BlockArity::OnePacket,
-    };
-
-    writer.write_all(BlockSignature::new(arity).as_ref())?;
+    let signature_stream_position = writer.stream_position()?;
+    writer.write_all(&[0; BLOCK_SIGNATURE_SIZE])?;
     writer.write_all(db_id.as_ref())?;
     let digest_stream_position = writer.stream_position()?;
     writer.write_all(&[0; BLOCK_DIGEST_SIZE])?;
+    let packet_count_stream_position = writer.stream_position()?;
 
-    let packet_count_stream_position = match write_large_packet {
-        None => Some(writer.stream_position()?),
-        Some(_) => None,
-    };
-    if write_large_packet.is_none() {
+    if !one_packet {
         writer.write_u8(0)?;
     }
 
-    let packets_start_stream_position = writer.stream_position()?;
+    let mut packets_count: u8 = 0;
+    let mut bytes_remaining: u16 = MANY_PACKETS_MAX_SIZE as u16;
 
-    match write_large_packet {
-        None => {
-            let mut packets_count: u8 = 0;
-            let mut bytes_remaining = MANY_PACKETS_MAX_SIZE;
-
-            while bytes_remaining > 0 && packets_count < u8::MAX {
-                let packet_start_stream_position = writer.stream_position()?;
-                match packet_provider.next_packet(bytes_remaining)? {
-                    PacketResult::Packet(write_packet) => {
-                        write_packet(writer)?;
-                        let packet_size = writer.stream_position()? - packet_start_stream_position;
-                        if packet_size > bytes_remaining as u64 {
-                            panic!()
-                        }
-                        bytes_remaining -= packet_size as usize;
-                        packets_count += 1;
-                    }
-                    PacketResult::TooBig => {
-                        writer.write_all(vec![0 as u8; bytes_remaining].as_slice())?;
-                        return Ok(BuildWriteBlockResult::MoreBlocksRequired);
-                    }
-                    PacketResult::End => {
-                        writer.write_all(vec![0 as u8; bytes_remaining].as_slice())?;
-                        return Ok(BuildWriteBlockResult::Done);
-                    }
-                }
-            }
-
-            writer.write_all(vec![0 as u8; bytes_remaining].as_slice())?;
+    while bytes_remaining > 0 && packets_count < u8::MAX {
+        let write_packet = match packet {
+            PacketResult::WritePacket(write_packet) => write_packet,
+            _ => break,
+        };
+        let expected_packet_size = write_packet.size();
+        let packet_start_stream_position = writer.stream_position()?;
+        write_packet.write(writer)?;
+        let actual_packet_size = writer.stream_position()? - packet_start_stream_position;
+        if actual_packet_size != expected_packet_size as u64 {
+            panic!();
         }
-        Some(write_packet) => {
-            write_packet(writer)?;
-            if writer.stream_position()? - packets_start_stream_position
-                != ONE_PACKET_MAX_SIZE as u64
-            {
-                panic!()
-            }
+
+        packets_count += 1;
+        bytes_remaining -= expected_packet_size;
+
+        if bytes_remaining as usize > MIN_PACKET_SIZE {
+            packet = packet_provider.next_packet(bytes_remaining)?;
+        } else {
+            packet = PacketResult::PacketTooBig;
         }
     }
 
-    Ok(BuildWriteBlockResult::MoreBlocksRequired)
+    writer.write_all(vec![0 as u8; bytes_remaining as usize].as_slice())?;
+
+    writer.seek(SeekFrom::Start(signature_stream_position))?;
+    writer.write_all(
+        BlockSignature::new(if one_packet {
+            BlockArity::OnePacket
+        } else {
+            BlockArity::ManyPackets
+        })
+        .as_ref(),
+    )?;
+
+    writer.seek(SeekFrom::Start(digest_stream_position))?;
+    todo!("Write digest");
+
+    if !one_packet {
+        writer.seek(SeekFrom::Start(packet_count_stream_position))?;
+        writer.write_u8(packets_count)?;
+    }
+
+    Ok(match &packet {
+        PacketResult::WritePacket(_) => panic!(),
+        PacketResult::PacketTooBig => BuildWriteBlockResult::MoreBlocksRequired,
+        PacketResult::End => BuildWriteBlockResult::Done,
+    })
 }
 
 pub enum BuildWriteBlockResult {
