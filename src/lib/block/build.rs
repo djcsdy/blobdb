@@ -60,7 +60,7 @@ pub fn build_write_block<W: Write + Seek>(
         }
     }
 
-    writer.write_all(vec![0 as u8; bytes_remaining as usize].as_slice())?;
+    writer.write_all(vec![0; bytes_remaining as usize].as_slice())?;
 
     writer.seek(SeekFrom::Start(signature_stream_position))?;
     writer.write_all(

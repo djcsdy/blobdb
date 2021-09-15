@@ -84,7 +84,7 @@ impl<R: Read> Packetizer<()> for ImportBlobDataPackets<R> {
 
         let max_data_size = max_size as usize - BLOB_DATA_PACKET_OVERHEAD;
 
-        let mut buf = vec![0 as u8; max_data_size];
+        let mut buf = vec![0; max_data_size];
         self.offset += self.tee_reader.read_at_most(&mut buf).unwrap(); // TODO handle
 
         Packetized::Packet {
