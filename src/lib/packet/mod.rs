@@ -4,7 +4,6 @@ pub use packetizer::{Packetized, Packetizer, PacketizerPostUpdater};
 pub use raw::{RawPacket, MIN_PACKET_SIZE};
 
 mod blob_data;
-mod build;
 mod invalid;
 mod packet;
 mod packetizer;

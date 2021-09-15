@@ -1,12 +1,12 @@
 use crate::lib::blob::{BlobId, BLOB_ID_SIZE};
 use crate::lib::io::ReadExt;
-use crate::lib::packet::build::{build_blob_data, DraftBlobDataPacket};
 use crate::lib::packet::packetizer::{Packetized, Packetizer, PacketizerPostUpdater};
 use crate::lib::packet::raw::{MAX_PAYLOAD_SIZE, PAYLOAD_OFFSET};
 use crate::lib::packet::{Packet, RawPacket};
 use arrayref::array_ref;
 use byteorder::{ByteOrder, LittleEndian};
 use sha2::{Digest, Sha256};
+use std::convert::TryInto;
 use std::io::Read;
 use tee_readwrite::TeeReader;
 
@@ -33,10 +33,12 @@ impl AsRef<[u8]> for BlobDataPacket {
 
 impl BlobDataPacket {
     pub fn new(blob_id: BlobId, offset: u64, data: Vec<u8>) -> BlobDataPacket {
-        BlobDataPacket(RawPacket::new(build_blob_data(
-            blob_id,
-            DraftBlobDataPacket { offset, data },
-        )))
+        let mut payload_bytes = Vec::with_capacity(data.len() + BLOB_DATA_OFFSET);
+        payload_bytes[BLOB_ID_OFFSET..BLOB_ID_SIZE].copy_from_slice(&blob_id.0);
+        LittleEndian::write_u64(&mut payload_bytes[OFFSET_OFFSET..OFFSET_END], offset);
+        payload_bytes[BLOB_DATA_OFFSET..].copy_from_slice(&data);
+
+        BlobDataPacket(RawPacket::new(BLOB_DATA_PACKET_TYPE_ID, &payload_bytes))
     }
 
     fn new_anonymous(offset: u64, data: Vec<u8>) -> BlobDataPacket {
@@ -92,7 +94,7 @@ impl<R: Read> Packetizer<(), ImportBlobDataPacketsPostUpdater> for ImportBlobDat
         self.offset += self.tee_reader.read_at_most(&mut buf).unwrap(); // TODO handle
 
         Packetized::Packet {
-            packet: RawPacket::new(buf).into(),
+            packet: BlobDataPacket::new_anonymous(self.offset.try_into().unwrap(), buf).into(),
             post_update: (),
         }
     }
