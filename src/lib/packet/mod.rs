@@ -6,5 +6,6 @@ mod blob_data;
 mod build;
 mod invalid;
 mod packet;
+mod packetizer;
 mod raw;
 mod type_id_and_length;
