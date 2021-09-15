@@ -51,7 +51,7 @@ impl RawPacket {
     }
 
     pub fn new_invalid() -> RawPacket {
-        RawPacket(vec![0; PAYLOAD_OFFSET])
+        RawPacket::new(0, &[])
     }
 
     fn type_id_and_length(&self) -> u16 {
