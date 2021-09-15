@@ -62,7 +62,7 @@ impl RawPacket {
 
 impl AsRef<[u8]> for RawPacket {
     fn as_ref(&self) -> &[u8] {
-        return &self.0;
+        &self.0
     }
 }
 
