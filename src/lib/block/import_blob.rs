@@ -1,37 +1,26 @@
-use std::io;
 use std::io::Read;
 
-use crate::lib::blob::BlobId;
 use crate::lib::block::block::Block;
+use crate::lib::block::blockifier::{Blockified, Blockifier};
 use crate::lib::db::DbId;
-use crate::lib::packet::{BlobDataPacket, ImportBlobDataPackets};
 
 impl Block {
     pub fn import_blob<R: Read>(db_id: DbId, reader: R) -> ImportBlobDataBlocks<R> {
-        ImportBlobDataBlocks {
-            db_id,
-            packets: BlobDataPacket::import_blob(reader),
-        }
+        ImportBlobDataBlocks { db_id, reader }
     }
 }
 
 pub struct ImportBlobDataBlocks<R: Read> {
     db_id: DbId,
-    packets: ImportBlobDataPackets<R>,
+    reader: R,
 }
 
-impl<R: Read> ImportBlobDataBlocks<R> {
-    pub fn end_and_digest_id(self) -> BlobId {
-        self.packets.end_and_digest_id()
+impl<R: Read> Blockifier<()> for ImportBlobDataBlocks<R> {
+    fn next_block(&mut self) -> Blockified<()> {
+        todo!()
     }
-}
 
-impl<R: Read> Iterator for ImportBlobDataBlocks<R> {
-    type Item = io::Result<Block>;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.packets
-            .next()
-            .map(|result| result.map(|packet| Block::new(self.db_id, vec![packet])))
+    fn apply_post_update(&mut self, block: &mut Block, post_update: ()) -> () {
+        todo!()
     }
 }

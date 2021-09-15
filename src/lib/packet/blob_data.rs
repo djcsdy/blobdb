@@ -1,23 +1,27 @@
 use crate::lib::blob::{BlobId, BLOB_ID_SIZE};
+use crate::lib::io::ReadExt;
 use crate::lib::packet::build::{build_blob_data, DraftBlobDataPacket};
-use crate::lib::packet::raw::{MAX_PACKET_SIZE, MAX_PAYLOAD_SIZE};
-use crate::lib::packet::RawPacket;
+use crate::lib::packet::packetizer::{Packetized, Packetizer};
+use crate::lib::packet::raw::{MAX_PAYLOAD_SIZE, PAYLOAD_OFFSET};
+use crate::lib::packet::{Packet, RawPacket};
 use arrayref::array_ref;
 use byteorder::{ByteOrder, LittleEndian};
 use sha2::{Digest, Sha256};
-use std::io::{ErrorKind, Read, Result};
+use std::io::Read;
 use tee_readwrite::TeeReader;
 
 pub const BLOB_DATA_PACKET_TYPE_ID: u8 = 1;
 
-const OFFSET_SIZE: usize = 8;
+pub const BLOB_DATA_PACKET_OVERHEAD: usize = PAYLOAD_OFFSET + BLOB_DATA_OFFSET;
+
+pub const OFFSET_SIZE: usize = 8;
 pub const MAX_DATA_SIZE: usize = MAX_PAYLOAD_SIZE - BLOB_DATA_OFFSET;
 
-const BLOB_ID_OFFSET: usize = 0;
-const BLOB_ID_END: usize = BLOB_ID_OFFSET + BLOB_ID_SIZE;
-const OFFSET_OFFSET: usize = BLOB_ID_END;
-const OFFSET_END: usize = OFFSET_OFFSET + OFFSET_SIZE;
-pub(super) const BLOB_DATA_OFFSET: usize = OFFSET_END;
+pub const BLOB_ID_OFFSET: usize = 0;
+pub const BLOB_ID_END: usize = BLOB_ID_OFFSET + BLOB_ID_SIZE;
+pub const OFFSET_OFFSET: usize = BLOB_ID_END;
+pub const OFFSET_END: usize = OFFSET_OFFSET + OFFSET_SIZE;
+pub const BLOB_DATA_OFFSET: usize = OFFSET_END;
 
 pub struct BlobDataPacket(pub(super) RawPacket);
 
@@ -64,52 +68,42 @@ impl BlobDataPacket {
     }
 }
 
-#[must_use = "iterators are lazy and do nothing unless consumed"]
 pub struct ImportBlobDataPackets<R: Read> {
     tee_reader: TeeReader<R, Sha256>,
-    offset: u64,
+    offset: usize,
     end: bool,
 }
 
-impl<R: Read> ImportBlobDataPackets<R> {
-    pub fn end_and_digest_id(self) -> BlobId {
-        let (_, digest) = self.tee_reader.into_inner();
-        BlobId(digest.finalize().into())
-    }
-}
-
-impl<R: Read> Iterator for ImportBlobDataPackets<R> {
-    type Item = Result<BlobDataPacket>;
-
-    fn next(&mut self) -> Option<Self::Item> {
+impl<R: Read> Packetizer<()> for ImportBlobDataPackets<R> {
+    fn next_packet(&mut self, max_size: u16) -> Packetized<()> {
         if self.end {
-            return None;
+            return Packetized::End;
+        } else if (max_size as usize) <= BLOB_DATA_PACKET_OVERHEAD {
+            return Packetized::PacketTooBig;
         }
 
-        let offset = self.offset;
-        let mut buf = [0 as u8; MAX_PACKET_SIZE];
-        let mut pos = 0;
-        loop {
-            match self.tee_reader.read(&mut buf[pos..]) {
-                Ok(0) => break,
-                Ok(count) => pos += count,
-                Err(error) => match error.kind() {
-                    ErrorKind::Interrupted => continue,
-                    _ => {
-                        self.end = true;
-                        return Some(Err(error));
-                    }
-                },
-            }
+        let max_data_size = max_size as usize - BLOB_DATA_PACKET_OVERHEAD;
+
+        let mut buf = vec![0 as u8; max_data_size];
+        self.offset += self.tee_reader.read_at_most(&mut buf).unwrap(); // TODO handle
+
+        Packetized::Packet {
+            packet: RawPacket::new(buf).into(),
+            post_update: (),
         }
+    }
 
-        self.offset += pos as u64;
-
-        if pos == 0 {
-            self.end = true;
-            return None;
+    fn apply_post_update(&mut self, packet: &mut Packet, _: ()) -> () {
+        match packet {
+            Packet::BlobData(packet) => todo!("set blob_id"),
+            _ => panic!(),
         }
-
-        Some(Ok(BlobDataPacket::new_anonymous(offset, buf.into())))
     }
 }
+
+// impl<R: Read> ImportBlobDataPackets<R> {
+//     pub fn end_and_digest_id(self) -> BlobId {
+//         let (_, digest) = self.tee_reader.into_inner();
+//         BlobId(digest.finalize().into())
+//     }
+// }
