@@ -78,7 +78,7 @@ impl Block {
     }
 
     fn digest(&self) -> BlockDigest {
-        BlockDigest(array_ref!(self.0, DIGEST_OFFSET, BLOCK_DIGEST_SIZE).clone())
+        BlockDigest(*array_ref!(self.0, DIGEST_OFFSET, BLOCK_DIGEST_SIZE))
     }
 
     pub(super) fn packet_count(&self) -> u8 {

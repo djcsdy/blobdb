@@ -48,7 +48,7 @@ impl BlobDataPacket {
     }
 
     pub fn blob_id(&self) -> BlobId {
-        BlobId(array_ref!(self.0.payload(), BLOB_ID_OFFSET, BLOB_ID_SIZE).clone())
+        BlobId(*array_ref!(self.0.payload(), BLOB_ID_OFFSET, BLOB_ID_SIZE))
     }
 
     pub fn offset(&self) -> u64 {
