@@ -6,7 +6,7 @@ pub trait Packetizer<PostUpdate, PostUpdater: PacketizerPostUpdater<PostUpdate>>
 }
 
 pub trait PacketizerPostUpdater<U> {
-    fn apply_post_update(&mut self, packet: &Packet, post_update: U) -> Packet;
+    fn apply_post_update(&mut self, packet: Packet, post_update: U) -> Packet;
 }
 
 pub enum Packetized<U> {

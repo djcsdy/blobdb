@@ -110,7 +110,7 @@ pub struct ImportBlobDataPostUpdater {
 }
 
 impl PacketizerPostUpdater<()> for ImportBlobDataPostUpdater {
-    fn apply_post_update(&mut self, packet: &Packet, _: ()) -> Packet {
+    fn apply_post_update(&mut self, packet: Packet, _: ()) -> Packet {
         match packet {
             Packet::BlobData(packet) => packet.with_blob_id(self.blob_id).into(),
             _ => panic!(),
