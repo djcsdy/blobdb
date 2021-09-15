@@ -1,16 +1,17 @@
+use std::convert::TryInto;
+use std::io::Read;
+
+use arrayref::array_ref;
+use byteorder::{ByteOrder, LittleEndian};
+use sha2::{Digest, Sha256};
+use tee_readwrite::TeeReader;
+
 use crate::lib::blob::{BlobId, BLOB_ID_SIZE};
 use crate::lib::io::ReadExt;
 use crate::lib::packet::packetizer::{Packetized, Packetizer, PacketizerPostUpdater};
 use crate::lib::packet::raw::{MAX_PAYLOAD_SIZE, PAYLOAD_OFFSET};
+use crate::lib::packet::type_id_and_length::BLOB_DATA_PACKET_TYPE_ID;
 use crate::lib::packet::{Packet, RawPacket};
-use arrayref::array_ref;
-use byteorder::{ByteOrder, LittleEndian};
-use sha2::{Digest, Sha256};
-use std::convert::TryInto;
-use std::io::Read;
-use tee_readwrite::TeeReader;
-
-pub const BLOB_DATA_PACKET_TYPE_ID: u8 = 1;
 
 pub const BLOB_DATA_PACKET_OVERHEAD: usize = PAYLOAD_OFFSET + BLOB_DATA_OFFSET;
 

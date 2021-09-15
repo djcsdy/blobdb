@@ -1,5 +1,8 @@
 use crate::lib::packet::raw::MAX_PAYLOAD_SIZE;
 
+pub const INVALID_PACKET_TYPE_ID: u8 = 0;
+pub const BLOB_DATA_PACKET_TYPE_ID: u8 = 1;
+
 pub fn combine_type_id_and_length(type_id: u8, length: usize) -> u16 {
     if length > MAX_PAYLOAD_SIZE {
         panic!();

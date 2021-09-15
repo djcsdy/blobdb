@@ -1,5 +1,5 @@
-use crate::lib::packet::blob_data::BLOB_DATA_PACKET_TYPE_ID;
 use crate::lib::packet::invalid::InvalidPacket;
+use crate::lib::packet::type_id_and_length::BLOB_DATA_PACKET_TYPE_ID;
 use crate::lib::packet::{BlobDataPacket, RawPacket};
 
 pub enum Packet {
