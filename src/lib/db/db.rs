@@ -23,7 +23,7 @@ impl Db {
             Db::open_dir(path)
         } else if path.file_name() == Some(OsStr::new(ROOT_FILE_NAME)) {
             path.parent()
-                .ok_or(io::Error::from(ErrorKind::NotFound))
+                .ok_or_else(|| io::Error::from(ErrorKind::NotFound))
                 .and_then(Db::open_dir)
         } else {
             Err(io::Error::from(ErrorKind::NotFound))
