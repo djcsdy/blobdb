@@ -52,7 +52,7 @@ impl Block {
             let mut packets_buffer = &mut buffer[packets_offset..];
             for packet in packets {
                 packets_buffer
-                    .write(RawPacket::from(P::into(packet)).as_ref())
+                    .write_all(RawPacket::from(P::into(packet)).as_ref())
                     .unwrap();
             }
         }
