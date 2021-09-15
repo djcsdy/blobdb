@@ -78,7 +78,7 @@ pub struct ImportBlobDataPackets<R: Read> {
     end: bool,
 }
 
-impl<R: Read> Packetizer<(), ImportBlobDataPostUpdater> for ImportBlobDataPackets<R> {
+impl<R: Read> Packetizer<(), ImportBlobDataPacketsPostUpdater> for ImportBlobDataPackets<R> {
     fn next_packet(&mut self, max_size: u16) -> Packetized<()> {
         if self.end {
             return Packetized::End;
@@ -97,19 +97,19 @@ impl<R: Read> Packetizer<(), ImportBlobDataPostUpdater> for ImportBlobDataPacket
         }
     }
 
-    fn into_post_updater(self) -> ImportBlobDataPostUpdater {
+    fn into_post_updater(self) -> ImportBlobDataPacketsPostUpdater {
         let (_, digest) = self.tee_reader.into_inner();
-        ImportBlobDataPostUpdater {
+        ImportBlobDataPacketsPostUpdater {
             blob_id: BlobId(digest.finalize().into()),
         }
     }
 }
 
-pub struct ImportBlobDataPostUpdater {
+pub struct ImportBlobDataPacketsPostUpdater {
     blob_id: BlobId,
 }
 
-impl PacketizerPostUpdater<()> for ImportBlobDataPostUpdater {
+impl PacketizerPostUpdater<()> for ImportBlobDataPacketsPostUpdater {
     fn apply_post_update(&mut self, packet: Packet, _: ()) -> Packet {
         match packet {
             Packet::BlobData(packet) => packet.with_blob_id(self.blob_id).into(),
