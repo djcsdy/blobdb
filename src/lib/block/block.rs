@@ -12,10 +12,9 @@ use crate::lib::packet::Packet;
 use crate::lib::packet::RawPacket;
 use std::mem::size_of;
 
-pub const BLOCK_SIZE: usize = 4096;
 pub const PACKET_COUNT_SIZE: usize = size_of::<u8>();
-pub const ONE_PACKET_MAX_SIZE: usize = BLOCK_SIZE - ONE_PACKET_OFFSET;
-pub const MANY_PACKETS_MAX_SIZE: usize = BLOCK_SIZE - MANY_PACKETS_OFFSET;
+pub const ONE_PACKET_MAX_SIZE: usize = Block::SIZE - ONE_PACKET_OFFSET;
+pub const MANY_PACKETS_MAX_SIZE: usize = Block::SIZE - MANY_PACKETS_OFFSET;
 
 const SIGNATURE_OFFSET: usize = 0;
 const SIGNATURE_END: usize = SIGNATURE_OFFSET + BLOCK_SIGNATURE_SIZE;
@@ -28,11 +27,13 @@ const ONE_PACKET_OFFSET: usize = PACKET_COUNT_OFFSET;
 const MANY_PACKETS_OFFSET: usize = PACKET_COUNT_OFFSET + PACKET_COUNT_SIZE;
 
 #[derive(Clone)]
-pub struct Block(pub(super) [u8; BLOCK_SIZE]);
+pub struct Block(pub(super) [u8; Block::SIZE]);
 
 impl Block {
+    pub const SIZE: usize = 4096;
+
     pub fn new<P: Into<Packet>>(db_id: DbId, packets: Vec<P>) -> Block {
-        let mut buffer = [0; BLOCK_SIZE];
+        let mut buffer = [0; Block::SIZE];
 
         let (arity, packets_offset) = match packets.len() {
             1 => (BlockArity::OnePacket, ONE_PACKET_OFFSET),
@@ -64,7 +65,7 @@ impl Block {
     }
 
     pub fn read<R: Read>(reader: &mut R) -> io::Result<Block> {
-        let mut buffer = [0; BLOCK_SIZE];
+        let mut buffer = [0; Block::SIZE];
         reader.read_exact(&mut buffer)?;
         Ok(Block(buffer))
     }

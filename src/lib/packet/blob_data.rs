@@ -112,6 +112,12 @@ pub struct ImportBlobDataPacketsPostUpdater {
     blob_id: BlobId,
 }
 
+impl ImportBlobDataPacketsPostUpdater {
+    pub fn blob_id(&self) -> BlobId {
+        self.blob_id
+    }
+}
+
 impl PacketizerPostUpdater<()> for ImportBlobDataPacketsPostUpdater {
     fn apply_post_update(&mut self, packet: Packet, _: ()) -> Packet {
         match packet {

@@ -1,3 +1,4 @@
+use crate::lib::blob::BlobId;
 use std::io::Read;
 
 use crate::lib::block::block::{Block, MANY_PACKETS_MAX_SIZE};
@@ -78,6 +79,12 @@ impl<R: Read> Blockifier<(), ImportBlobDataPostUpdater> for ImportBlobDataBlocks
 
 pub struct ImportBlobDataPostUpdater {
     packet_post_updater: ImportBlobDataPacketsPostUpdater,
+}
+
+impl ImportBlobDataPostUpdater {
+    pub fn blob_id(&self) -> BlobId {
+        self.packet_post_updater.blob_id()
+    }
 }
 
 impl BlockifierPostUpdater<()> for ImportBlobDataPostUpdater {
