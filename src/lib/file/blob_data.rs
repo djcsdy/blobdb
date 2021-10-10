@@ -1,10 +1,10 @@
 use crate::lib::blob::BlobId;
 use crate::lib::block::{Block, Blockified, Blockifier, BlockifierPostUpdater};
 use crate::lib::db::DbId;
-use crate::lib::file::path::temp_dir_path;
+use crate::lib::file::path::{blob_file_path, temp_dir_path};
 use std::io::{Read, Result, Seek, SeekFrom, Write};
 use std::path::Path;
-use tempfile::NamedTempFile;
+use tempfile::{NamedTempFile, PersistError};
 
 pub fn import_blob<R: Read>(db_id: DbId, base_dir: &Path, reader: R) -> Result<BlobId> {
     let mut file = NamedTempFile::new_in(temp_dir_path(base_dir))?;
@@ -30,5 +30,10 @@ pub fn import_blob<R: Read>(db_id: DbId, base_dir: &Path, reader: R) -> Result<B
         file.write_all(updated_block.as_ref())?;
     }
 
-    Ok(post_updater.blob_id())
+    let blob_id = post_updater.blob_id();
+
+    file.persist_noclobber(blob_file_path(base_dir, blob_id))
+        .map_err(|PersistError { error, .. }| error)?;
+
+    Ok(blob_id)
 }
