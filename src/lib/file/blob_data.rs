@@ -6,8 +6,8 @@ use std::io::{Read, Result, Seek, SeekFrom, Write};
 use std::path::Path;
 use tempfile::{NamedTempFile, PersistError};
 
-pub fn import_blob<R: Read>(db_id: DbId, base_dir: &Path, reader: R) -> Result<BlobId> {
-    let mut file = NamedTempFile::new_in(temp_dir_path(base_dir))?;
+pub fn import_blob<R: Read>(db_id: DbId, base_path: &Path, reader: R) -> Result<BlobId> {
+    let mut file = NamedTempFile::new_in(temp_dir_path(base_path))?;
     let mut blockifier = Block::import_blob(db_id, reader);
     let mut block_count: u64 = 0;
 
@@ -32,7 +32,7 @@ pub fn import_blob<R: Read>(db_id: DbId, base_dir: &Path, reader: R) -> Result<B
 
     let blob_id = post_updater.blob_id();
 
-    file.persist_noclobber(blob_file_path(base_dir, blob_id))
+    file.persist_noclobber(blob_file_path(base_path, blob_id))
         .map_err(|PersistError { error, .. }| error)?;
 
     Ok(blob_id)
