@@ -1,10 +1,12 @@
+use crate::lib::blob::BlobId;
 use crate::lib::block::Block;
 use crate::lib::db::db_id::DbId;
+use crate::lib::file::import_blob;
 use crate::lib::file::path::{lock_file_path, root_file_path, ROOT_FILE_NAME};
 use fs2::FileExt;
 use std::ffi::OsStr;
 use std::fs::{File, OpenOptions};
-use std::io::ErrorKind;
+use std::io::{ErrorKind, Read};
 use std::path::Path;
 use std::{fs, io};
 
@@ -59,8 +61,11 @@ impl Db {
         })
     }
 
-    pub fn id(&self) -> DbId {
-        self.id
+    pub fn import_blob<R>(&self, reader: &mut R) -> io::Result<BlobId>
+    where
+        R: Read,
+    {
+        import_blob(self.id, &self.path, reader)
     }
 }
 
