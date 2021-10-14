@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 
-pub use db::Db;
+pub use blob::BlobId;
+pub use db::{Db, DbId};
 
 mod blob;
 mod block;

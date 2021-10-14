@@ -1,13 +1,11 @@
 use crate::cli::options::AddOptions;
-use sha2::{Digest, Sha256};
+use crate::lib::{BlobId, Db};
 use std::fs::File;
-use std::io::{copy, Error};
+use std::io::Result;
+use std::path::Path;
 
-pub fn add(options: AddOptions) -> Result<[u8; 32], Error> {
+pub fn add(options: AddOptions) -> Result<BlobId> {
+    let db = Db::open(Path::new("."))?;
     let mut file = File::open(&options.path)?;
-    let mut hasher = Sha256::new();
-    copy(&mut file, &mut hasher)?;
-    let hash = hasher.finalize();
-
-    Ok(hash.into())
+    db.import_blob(&mut file)
 }
