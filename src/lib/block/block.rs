@@ -78,6 +78,10 @@ impl Block {
         DbId(*array_ref!(self.0, DB_ID_OFFSET, DB_ID_SIZE))
     }
 
+    pub fn valid(&self) -> bool {
+        self.digest() == BlockDigest::digest_block(self)
+    }
+
     fn digest(&self) -> BlockDigest {
         BlockDigest(*array_ref!(self.0, DIGEST_OFFSET, BLOCK_DIGEST_SIZE))
     }
