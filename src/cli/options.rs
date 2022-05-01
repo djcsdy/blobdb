@@ -1,17 +1,17 @@
-use clap::Clap;
+use clap::Parser;
 
-#[derive(Clap)]
+#[derive(Parser)]
 pub struct Options {
     #[clap(subcommand)]
     pub subcommand: Subcommand,
 }
 
-#[derive(Clap)]
+#[derive(Parser)]
 pub enum Subcommand {
     Add(AddOptions),
 }
 
-#[derive(Clap)]
+#[derive(Parser)]
 pub struct AddOptions {
     pub path: String,
 }

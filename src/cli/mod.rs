@@ -2,7 +2,7 @@ mod add;
 mod options;
 
 use add::add;
-use clap::Clap;
+use clap::Parser;
 use options::{Options, Subcommand};
 
 pub fn main() {
