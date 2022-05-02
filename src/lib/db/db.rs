@@ -1,8 +1,8 @@
 use crate::lib::blob::BlobId;
 use crate::lib::block::Block;
 use crate::lib::db::db_id::DbId;
-use crate::lib::file::import_blob;
-use crate::lib::file::path::{lock_file_path, root_file_path, ROOT_FILE_NAME};
+use crate::lib::file::path::{blob_file_path, lock_file_path, root_file_path, ROOT_FILE_NAME};
+use crate::lib::file::{import_blob, read_blob, ReadBlob};
 use fs2::FileExt;
 use std::ffi::OsStr;
 use std::fs::{File, OpenOptions};
@@ -66,6 +66,11 @@ impl Db {
         R: Read,
     {
         import_blob(self.id, &self.path, reader)
+    }
+
+    pub fn read_blob(&self, blob_id: BlobId) -> io::Result<ReadBlob<File>> {
+        File::open(blob_file_path(&self.path, blob_id))
+            .map(|file| read_blob(self.id, blob_id, file))
     }
 }
 
