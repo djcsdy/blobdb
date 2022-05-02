@@ -1,5 +1,7 @@
+pub use blob::import_blob;
+pub use read_blob::ReadBlob;
+
 mod blob;
 mod file_id;
 pub mod path;
-
-pub use blob::import_blob;
+mod read_blob;
