@@ -1,4 +1,5 @@
 use hex::FromHexError;
+use std::fmt::{Display, Formatter};
 
 pub const BLOB_ID_SIZE: usize = 32;
 
@@ -30,5 +31,11 @@ impl AsRef<[u8]> for BlobId {
 impl AsRef<[u8; 32]> for BlobId {
     fn as_ref(&self) -> &[u8; BLOB_ID_SIZE] {
         &self.0
+    }
+}
+
+impl Display for BlobId {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&self.to_string())
     }
 }
