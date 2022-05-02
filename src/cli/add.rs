@@ -1,5 +1,5 @@
 use crate::cli::options::AddOptions;
-use crate::lib::{BlobId, Db};
+use crate::lib::Db;
 use std::fs::File;
 use std::path::Path;
 

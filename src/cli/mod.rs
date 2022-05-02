@@ -10,7 +10,7 @@ pub fn main() {
 
     match options.subcommand {
         Subcommand::Add(options) => {
-            add(options).unwrap();
+            add(options);
         }
     }
 }
