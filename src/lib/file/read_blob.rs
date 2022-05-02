@@ -23,7 +23,7 @@ pub fn read_blob<R: Read>(db_id: DbId, blob_id: BlobId, reader: R) -> ReadBlob<R
         reader,
         packets: None,
         packet: VecDeque::new(),
-        offset: 0
+        offset: 0,
     }
 }
 
@@ -34,7 +34,7 @@ impl<R: Read> Read for ReadBlob<R> {
 }
 
 impl<R: Read> ReadBlob<R> {
-    fn read_from_packet(&mut self, buf: &mut [u8]) -> Result<usize> {
+    fn read_from_packet(&mut self, mut buf: &mut [u8]) -> Result<usize> {
         if buf.len() == 0 {
             return Ok(0);
         }
@@ -75,7 +75,7 @@ impl<R: Read> ReadBlob<R> {
 
     fn next_packet(&mut self) -> Result<Packet> {
         loop {
-            if let Some(packet) = self.packets.and_then(|mut packets| packets.next()) {
+            if let Some(packet) = self.packets.as_mut().and_then(|packets| packets.next()) {
                 return Ok(packet);
             }
             self.packets = Some(self.next_packets()?);
