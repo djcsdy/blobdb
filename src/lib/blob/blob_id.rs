@@ -1,5 +1,3 @@
-use std::path::PathBuf;
-
 pub const BLOB_ID_SIZE: usize = 32;
 
 #[derive(Copy, Clone, Eq, PartialEq)]
@@ -10,8 +8,8 @@ impl BlobId {
         BlobId([0; BLOB_ID_SIZE])
     }
 
-    pub fn name(&self) -> PathBuf {
-        hex::encode(self.0).into()
+    pub fn to_string(&self) -> String {
+        hex::encode(self.0)
     }
 }
 
