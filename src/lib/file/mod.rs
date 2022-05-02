@@ -1,5 +1,5 @@
 pub use blob::import_blob;
-pub use read_blob::ReadBlob;
+pub use read_blob::{read_blob, ReadBlob};
 
 mod blob;
 mod file_id;

@@ -16,6 +16,17 @@ pub struct ReadBlob<R: Read> {
     offset: u64,
 }
 
+pub fn read_blob<R: Read>(db_id: DbId, blob_id: BlobId, reader: R) -> ReadBlob<R> {
+    ReadBlob {
+        db_id,
+        blob_id,
+        reader,
+        packets: None,
+        packet: VecDeque::new(),
+        offset: 0
+    }
+}
+
 impl<R: Read> Read for ReadBlob<R> {
     fn read(&mut self, buf: &mut [u8]) -> Result<usize> {
         self.read_from_packet(buf)
