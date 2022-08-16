@@ -4,7 +4,7 @@ use std::fs::File;
 use std::io::copy;
 use std::path::Path;
 
-pub fn read(options: ReadOptions) -> () {
+pub fn read(options: ReadOptions) {
     let db = Db::open(Path::new(".")).unwrap();
     let blob_id = BlobId::parse(&options.blob_id).unwrap();
     let mut reader = db.read_blob(blob_id).unwrap();
