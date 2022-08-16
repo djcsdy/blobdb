@@ -1,16 +1,16 @@
 use crate::lib::packet::Packet;
 
-pub trait Packetizer<PostUpdate, PostUpdater: PacketizerPostUpdater<PostUpdate>> {
-    fn next_packet(&mut self, max_size: u16) -> Packetized<PostUpdate>;
-    fn into_post_updater(self) -> PostUpdater;
+pub trait Packetizer<FinalizeData, Finalizer: PacketizerFinalizer<FinalizeData>> {
+    fn next_packet(&mut self, max_size: u16) -> Packetized<FinalizeData>;
+    fn into_finalizer(self) -> Finalizer;
 }
 
-pub trait PacketizerPostUpdater<U> {
-    fn apply_post_update(&mut self, packet: Packet, post_update: U) -> Packet;
+pub trait PacketizerFinalizer<U> {
+    fn finalize(&mut self, packet: Packet, finalize_data: U) -> Packet;
 }
 
 pub enum Packetized<U> {
-    Packet { packet: Packet, post_update: U },
+    Packet { packet: Packet, finalize_data: U },
     PacketTooBig,
     End,
 }

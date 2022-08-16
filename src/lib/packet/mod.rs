@@ -1,6 +1,6 @@
-pub use blob_data::{BlobDataPacket, ImportBlobDataPackets, ImportBlobDataPacketsPostUpdater};
+pub use blob_data::{BlobDataPacket, ImportBlobDataPackets, ImportBlobDataPacketsFinalizer};
 pub use packet::Packet;
-pub use packetizer::{Packetized, Packetizer, PacketizerPostUpdater};
+pub use packetizer::{Packetized, Packetizer, PacketizerFinalizer};
 pub use raw::{RawPacket, MIN_PACKET_SIZE};
 
 mod blob_data;

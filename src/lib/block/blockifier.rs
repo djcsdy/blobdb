@@ -1,15 +1,15 @@
 use crate::lib::block::Block;
 
-pub trait Blockifier<PostUpdate, PostUpdater: BlockifierPostUpdater<PostUpdate>> {
-    fn next_block(&mut self) -> Blockified<PostUpdate>;
-    fn into_post_updater(self) -> PostUpdater;
+pub trait Blockifier<FinalizeData, Finalizer: BlockifierFinalizer<FinalizeData>> {
+    fn next_block(&mut self) -> Blockified<FinalizeData>;
+    fn into_finalizer(self) -> Finalizer;
 }
 
 pub enum Blockified<U> {
-    Block { block: Block, post_update: U },
+    Block { block: Block, finalize_data: U },
     End,
 }
 
-pub trait BlockifierPostUpdater<U> {
-    fn apply_post_update(&mut self, block: Block, post_update: U) -> Block;
+pub trait BlockifierFinalizer<U> {
+    fn finalize(&mut self, block: Block, finalize_data: U) -> Block;
 }

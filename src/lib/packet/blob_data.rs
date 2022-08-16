@@ -8,7 +8,7 @@ use tee_readwrite::TeeReader;
 
 use crate::lib::blob::{BlobId, BLOB_ID_SIZE};
 use crate::lib::io::ReadExt;
-use crate::lib::packet::packetizer::{Packetized, Packetizer, PacketizerPostUpdater};
+use crate::lib::packet::packetizer::{Packetized, Packetizer, PacketizerFinalizer};
 use crate::lib::packet::raw::{MAX_PAYLOAD_SIZE, PAYLOAD_OFFSET};
 use crate::lib::packet::type_id_and_length::BLOB_DATA_PACKET_TYPE_ID;
 use crate::lib::packet::{Packet, RawPacket};
@@ -81,7 +81,7 @@ pub struct ImportBlobDataPackets<R: Read> {
     end: bool,
 }
 
-impl<R: Read> Packetizer<(), ImportBlobDataPacketsPostUpdater> for ImportBlobDataPackets<R> {
+impl<R: Read> Packetizer<(), ImportBlobDataPacketsFinalizer> for ImportBlobDataPackets<R> {
     fn next_packet(&mut self, max_size: u16) -> Packetized<()> {
         if self.end {
             return Packetized::End;
@@ -96,30 +96,30 @@ impl<R: Read> Packetizer<(), ImportBlobDataPacketsPostUpdater> for ImportBlobDat
 
         Packetized::Packet {
             packet: BlobDataPacket::new_anonymous(self.offset.try_into().unwrap(), buf).into(),
-            post_update: (),
+            finalize_data: (),
         }
     }
 
-    fn into_post_updater(self) -> ImportBlobDataPacketsPostUpdater {
+    fn into_finalizer(self) -> ImportBlobDataPacketsFinalizer {
         let (_, digest) = self.tee_reader.into_inner();
-        ImportBlobDataPacketsPostUpdater {
+        ImportBlobDataPacketsFinalizer {
             blob_id: BlobId(digest.finalize().into()),
         }
     }
 }
 
-pub struct ImportBlobDataPacketsPostUpdater {
+pub struct ImportBlobDataPacketsFinalizer {
     blob_id: BlobId,
 }
 
-impl ImportBlobDataPacketsPostUpdater {
+impl ImportBlobDataPacketsFinalizer {
     pub fn blob_id(&self) -> BlobId {
         self.blob_id
     }
 }
 
-impl PacketizerPostUpdater<()> for ImportBlobDataPacketsPostUpdater {
-    fn apply_post_update(&mut self, packet: Packet, _: ()) -> Packet {
+impl PacketizerFinalizer<()> for ImportBlobDataPacketsFinalizer {
+    fn finalize(&mut self, packet: Packet, _: ()) -> Packet {
         match packet {
             Packet::BlobData(packet) => packet.with_blob_id(self.blob_id).into(),
             _ => panic!(),

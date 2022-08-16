@@ -2,12 +2,12 @@ use crate::lib::blob::BlobId;
 use std::io::Read;
 
 use crate::lib::block::block::{Block, MANY_PACKETS_MAX_SIZE};
-use crate::lib::block::blockifier::{Blockified, Blockifier, BlockifierPostUpdater};
+use crate::lib::block::blockifier::{Blockified, Blockifier, BlockifierFinalizer};
 use crate::lib::block::ONE_PACKET_MAX_SIZE;
 use crate::lib::db::DbId;
 use crate::lib::packet::{
-    BlobDataPacket, ImportBlobDataPackets, ImportBlobDataPacketsPostUpdater, Packetized,
-    Packetizer, PacketizerPostUpdater, MIN_PACKET_SIZE,
+    BlobDataPacket, ImportBlobDataPackets, ImportBlobDataPacketsFinalizer, Packetized, Packetizer,
+    PacketizerFinalizer, MIN_PACKET_SIZE,
 };
 
 impl Block {
@@ -24,7 +24,7 @@ pub struct ImportBlobDataBlocks<R: Read> {
     packetizer: ImportBlobDataPackets<R>,
 }
 
-impl<R: Read> Blockifier<(), ImportBlobDataPostUpdater> for ImportBlobDataBlocks<R> {
+impl<R: Read> Blockifier<(), ImportBlobDataFinalizer> for ImportBlobDataBlocks<R> {
     fn next_block(&mut self) -> Blockified<()> {
         let mut packets = vec![];
         let mut packetized = self.packetizer.next_packet(ONE_PACKET_MAX_SIZE as u16);
@@ -65,35 +65,35 @@ impl<R: Read> Blockifier<(), ImportBlobDataPostUpdater> for ImportBlobDataBlocks
         } else {
             Blockified::Block {
                 block: Block::new(self.db_id, packets),
-                post_update: (),
+                finalize_data: (),
             }
         }
     }
 
-    fn into_post_updater(self) -> ImportBlobDataPostUpdater {
-        ImportBlobDataPostUpdater {
-            packet_post_updater: self.packetizer.into_post_updater(),
+    fn into_finalizer(self) -> ImportBlobDataFinalizer {
+        ImportBlobDataFinalizer {
+            packet_finalizer: self.packetizer.into_finalizer(),
         }
     }
 }
 
-pub struct ImportBlobDataPostUpdater {
-    packet_post_updater: ImportBlobDataPacketsPostUpdater,
+pub struct ImportBlobDataFinalizer {
+    packet_finalizer: ImportBlobDataPacketsFinalizer,
 }
 
-impl ImportBlobDataPostUpdater {
+impl ImportBlobDataFinalizer {
     pub fn blob_id(&self) -> BlobId {
-        self.packet_post_updater.blob_id()
+        self.packet_finalizer.blob_id()
     }
 }
 
-impl BlockifierPostUpdater<()> for ImportBlobDataPostUpdater {
-    fn apply_post_update(&mut self, block: Block, _: ()) -> Block {
+impl BlockifierFinalizer<()> for ImportBlobDataFinalizer {
+    fn finalize(&mut self, block: Block, _: ()) -> Block {
         Block::new(
             block.db_id(),
             block
                 .into_packets()
-                .map(|packet| self.packet_post_updater.apply_post_update(packet, ()))
+                .map(|packet| self.packet_finalizer.finalize(packet, ()))
                 .collect(),
         )
     }
