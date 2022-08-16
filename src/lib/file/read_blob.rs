@@ -35,11 +35,11 @@ impl<R: Read> Read for ReadBlob<R> {
 
 impl<R: Read> ReadBlob<R> {
     fn read_from_packet(&mut self, mut buf: &mut [u8]) -> Result<usize> {
-        if buf.len() == 0 {
+        if buf.is_empty() {
             return Ok(0);
         }
 
-        if self.packet.len() == 0 {
+        if self.packet.is_empty() {
             match self.next_blob_data() {
                 Ok(packet) => self.packet = packet,
                 Err(error) => {
