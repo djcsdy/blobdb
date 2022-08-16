@@ -16,10 +16,6 @@ impl BlobId {
         hex::decode_to_slice(text, &mut buf)?;
         Ok(BlobId(buf))
     }
-
-    pub fn to_string(&self) -> String {
-        hex::encode(self.0)
-    }
 }
 
 impl AsRef<[u8]> for BlobId {
@@ -36,6 +32,6 @@ impl AsRef<[u8; 32]> for BlobId {
 
 impl Display for BlobId {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&self.to_string())
+        f.write_str(hex::encode(self.0).as_str())
     }
 }
