@@ -8,7 +8,7 @@ edition = "2018"
 [dependencies]
 clap = { version = "=3.2.22", features = ["derive"] }
 sha2 = "=0.10.6"
-itertools = "=0.10.3"
+itertools = "=0.10.5"
 byteorder = "=1.4.3"
 arrayref = "=0.3.6"
 fs2 = "=0.4.3"
