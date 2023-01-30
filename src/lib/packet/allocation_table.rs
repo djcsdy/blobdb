@@ -20,7 +20,7 @@ impl AsRef<[u8]> for SequentialAllocationTablePacket {
 }
 
 impl SequentialAllocationTablePacket {
-    pub fn new<const SIZE: usize>(offset: u64, bitmap: Vec<u8>) -> SequentialAllocationTablePacket {
+    pub fn new(offset: u64, bitmap: Vec<u8>) -> SequentialAllocationTablePacket {
         let mut payload_bytes = Vec::with_capacity(bitmap.len() + BITMAP_OFFSET);
         LittleEndian::write_u64(&mut payload_bytes[OFFSET_OFFSET..OFFSET_END], offset);
         payload_bytes[BITMAP_OFFSET..].copy_from_slice(&bitmap);
