@@ -9,8 +9,8 @@ pub struct BlockDigest(pub [u8; BLOCK_DIGEST_SIZE]);
 impl BlockDigest {
     pub fn digest_block(block: &Block) -> BlockDigest {
         let mut digest = Sha256::new();
-        digest.update(&block.db_id());
-        digest.update(&[block.packet_count()]);
+        digest.update(block.db_id());
+        digest.update([block.packet_count()]);
         digest.update(block.raw_packets_bytes());
         BlockDigest(digest.finalize().into())
     }
