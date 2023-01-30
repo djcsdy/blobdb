@@ -20,7 +20,7 @@ pub fn import_blob<R: Read>(db_id: DbId, base_path: &Path, reader: R) -> Result<
         block_count += 1;
     }
 
-    file.seek(SeekFrom::Start(0))?;
+    file.rewind()?;
 
     let mut finalizer = blockifier.into_finalizer();
     for _ in 0..block_count {
