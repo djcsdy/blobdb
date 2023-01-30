@@ -30,7 +30,7 @@ impl<R: Read> Blockifier<(), ImportBlobDataFinalizer> for ImportBlobDataBlocks<R
         let mut packetized = self.packetizer.next_packet(ONE_PACKET_MAX_SIZE as u16);
 
         let one_packet = match &packetized {
-            Packetized::Packet { packet, .. } => packet.size() as usize == ONE_PACKET_MAX_SIZE,
+            Packetized::Packet { packet, .. } => packet.size() == ONE_PACKET_MAX_SIZE,
             Packetized::PacketTooBig => false,
             Packetized::End => false,
         };
