@@ -15,14 +15,14 @@ use crate::lib::packet::{Packet, RawPacket};
 
 pub const BLOB_DATA_PACKET_OVERHEAD: usize = PAYLOAD_OFFSET + BLOB_DATA_OFFSET;
 
-pub const OFFSET_SIZE: usize = 8;
+const OFFSET_SIZE: usize = 8;
 pub const MAX_DATA_SIZE: usize = MAX_PAYLOAD_SIZE - BLOB_DATA_OFFSET;
 
-pub const BLOB_ID_OFFSET: usize = 0;
-pub const BLOB_ID_END: usize = BLOB_ID_OFFSET + BLOB_ID_SIZE;
-pub const OFFSET_OFFSET: usize = BLOB_ID_END;
-pub const OFFSET_END: usize = OFFSET_OFFSET + OFFSET_SIZE;
-pub const BLOB_DATA_OFFSET: usize = OFFSET_END;
+const BLOB_ID_OFFSET: usize = 0;
+const BLOB_ID_END: usize = BLOB_ID_OFFSET + BLOB_ID_SIZE;
+const OFFSET_OFFSET: usize = BLOB_ID_END;
+const OFFSET_END: usize = OFFSET_OFFSET + OFFSET_SIZE;
+const BLOB_DATA_OFFSET: usize = OFFSET_END;
 
 pub struct BlobDataPacket(pub(super) RawPacket);
 

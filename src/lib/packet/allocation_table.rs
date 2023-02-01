@@ -4,12 +4,12 @@ use crate::lib::packet::RawPacket;
 use arrayref::array_ref;
 use byteorder::{ByteOrder, LittleEndian};
 
-pub const OFFSET_SIZE: usize = 8;
+const OFFSET_SIZE: usize = 8;
 pub const MAX_BITMAP_SIZE: usize = MAX_PAYLOAD_SIZE - BITMAP_OFFSET;
 
-pub const OFFSET_OFFSET: usize = 0;
-pub const OFFSET_END: usize = OFFSET_OFFSET + OFFSET_SIZE;
-pub const BITMAP_OFFSET: usize = OFFSET_END;
+const OFFSET_OFFSET: usize = 0;
+const OFFSET_END: usize = OFFSET_OFFSET + OFFSET_SIZE;
+const BITMAP_OFFSET: usize = OFFSET_END;
 
 pub struct SequentialAllocationTablePacket(pub(super) RawPacket);
 
