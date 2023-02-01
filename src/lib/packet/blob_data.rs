@@ -1,5 +1,6 @@
 use std::convert::TryInto;
 use std::io::Read;
+use std::mem::size_of;
 
 use arrayref::array_ref;
 use byteorder::{ByteOrder, LittleEndian};
@@ -15,7 +16,7 @@ use crate::lib::packet::{Packet, RawPacket};
 
 pub const BLOB_DATA_PACKET_OVERHEAD: usize = PAYLOAD_OFFSET + BLOB_DATA_OFFSET;
 
-const OFFSET_SIZE: usize = 8;
+const OFFSET_SIZE: usize = size_of::<u64>();
 pub const MAX_DATA_SIZE: usize = MAX_PAYLOAD_SIZE - BLOB_DATA_OFFSET;
 
 const BLOB_ID_OFFSET: usize = 0;

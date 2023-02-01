@@ -3,8 +3,9 @@ use crate::lib::packet::type_id_and_length::SEQUENTIAL_ALLOCATION_TABLE_PACKET_T
 use crate::lib::packet::RawPacket;
 use arrayref::array_ref;
 use byteorder::{ByteOrder, LittleEndian};
+use std::mem::size_of;
 
-const OFFSET_SIZE: usize = 8;
+const OFFSET_SIZE: usize = size_of::<u64>();
 pub const MAX_BITMAP_SIZE: usize = MAX_PAYLOAD_SIZE - BITMAP_OFFSET;
 
 const OFFSET_OFFSET: usize = 0;
