@@ -10,7 +10,7 @@ clap = { version = "=4.1.11", features = ["derive"] }
 sha2 = "=0.10.6"
 itertools = "=0.10.5"
 byteorder = "=1.4.3"
-arrayref = "=0.3.6"
+arrayref = "=0.3.7"
 fs2 = "=0.4.3"
 tee_readwrite = "=0.1.0"
 hex = "=0.4.3"
