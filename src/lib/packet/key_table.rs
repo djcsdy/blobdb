@@ -7,3 +7,9 @@ impl AsRef<[u8]> for KeyTablePacket {
         self.0.as_ref()
     }
 }
+
+impl KeyTablePacket {
+    pub fn size(&self) -> usize {
+        self.0.size()
+    }
+}
