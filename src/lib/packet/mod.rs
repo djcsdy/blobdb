@@ -6,6 +6,7 @@ pub use raw::{RawPacket, MIN_PACKET_SIZE};
 mod allocation_table;
 mod blob_data;
 mod invalid;
+mod key_table;
 mod packet;
 mod packetizer;
 mod raw;
