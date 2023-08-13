@@ -4,12 +4,12 @@ use std::io::{Read, Write};
 
 use arrayref::array_ref;
 
-use crate::lib::block::block_digest::{BlockDigest, BLOCK_DIGEST_SIZE};
-use crate::lib::block::packets::Packets;
-use crate::lib::block::signature::{BlockArity, BlockSignature, BLOCK_SIGNATURE_SIZE};
-use crate::lib::db::{DbId, DB_ID_SIZE};
-use crate::lib::packet::Packet;
-use crate::lib::packet::RawPacket;
+use crate::block::block_digest::{BlockDigest, BLOCK_DIGEST_SIZE};
+use crate::block::packets::Packets;
+use crate::block::signature::{BlockArity, BlockSignature, BLOCK_SIGNATURE_SIZE};
+use crate::db::{DbId, DB_ID_SIZE};
+use crate::packet::Packet;
+use crate::packet::RawPacket;
 use std::mem::size_of;
 
 pub const PACKET_COUNT_SIZE: usize = size_of::<u8>();

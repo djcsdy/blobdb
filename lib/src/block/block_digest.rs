@@ -1,4 +1,4 @@
-use crate::lib::block::block::Block;
+use crate::block::block::Block;
 use sha2::{Digest, Sha256};
 
 pub const BLOCK_DIGEST_SIZE: usize = 32;

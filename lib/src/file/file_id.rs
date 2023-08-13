@@ -1,4 +1,4 @@
-use crate::lib::blob::BlobId;
+use crate::blob::BlobId;
 
 pub enum FileId {
     Anonymous,

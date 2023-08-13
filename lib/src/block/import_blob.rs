@@ -1,11 +1,11 @@
-use crate::lib::blob::BlobId;
+use crate::blob::BlobId;
 use std::io::Read;
 
-use crate::lib::block::block::{Block, MANY_PACKETS_MAX_SIZE};
-use crate::lib::block::blockifier::{Blockified, Blockifier, BlockifierFinalizer};
-use crate::lib::block::ONE_PACKET_MAX_SIZE;
-use crate::lib::db::DbId;
-use crate::lib::packet::{
+use crate::block::block::{Block, MANY_PACKETS_MAX_SIZE};
+use crate::block::blockifier::{Blockified, Blockifier, BlockifierFinalizer};
+use crate::block::ONE_PACKET_MAX_SIZE;
+use crate::db::DbId;
+use crate::packet::{
     BlobDataPacket, ImportBlobDataPackets, ImportBlobDataPacketsFinalizer, Packetized, Packetizer,
     PacketizerFinalizer, MIN_PACKET_SIZE,
 };

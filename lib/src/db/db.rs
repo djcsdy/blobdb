@@ -1,5 +1,5 @@
-use crate::lib::file::ReadBlob;
-use crate::lib::BlobId;
+use crate::file::ReadBlob;
+use crate::BlobId;
 use std::io;
 use std::io::Read;
 

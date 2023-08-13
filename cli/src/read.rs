@@ -1,5 +1,5 @@
-use crate::cli::options::ReadOptions;
-use crate::lib::{BlobId, Db, FsDb};
+use crate::options::ReadOptions;
+use blobdb::{BlobId, Db, FsDb};
 use std::fs::File;
 use std::io::copy;
 use std::path::Path;

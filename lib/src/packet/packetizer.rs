@@ -1,4 +1,4 @@
-use crate::lib::packet::Packet;
+use crate::packet::Packet;
 
 pub trait Packetizer<FinalizeData, Finalizer: PacketizerFinalizer<FinalizeData>> {
     fn next_packet(&mut self, max_size: u16) -> Packetized<FinalizeData>;

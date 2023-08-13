@@ -1,7 +1,7 @@
-use crate::lib::block::Block;
-use crate::lib::file::path::{blob_file_path, lock_file_path, root_file_path, ROOT_FILE_NAME};
-use crate::lib::file::{import_blob, read_blob, ReadBlob};
-use crate::lib::{BlobId, Db, DbId};
+use crate::block::Block;
+use crate::file::path::{blob_file_path, lock_file_path, root_file_path, ROOT_FILE_NAME};
+use crate::file::{import_blob, read_blob, ReadBlob};
+use crate::{BlobId, Db, DbId};
 use fs2::FileExt;
 use std::ffi::OsStr;
 use std::fs::{File, OpenOptions};

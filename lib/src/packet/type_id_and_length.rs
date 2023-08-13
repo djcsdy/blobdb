@@ -1,4 +1,4 @@
-use crate::lib::packet::raw::MAX_PAYLOAD_SIZE;
+use crate::packet::raw::MAX_PAYLOAD_SIZE;
 
 pub const INVALID_PACKET_TYPE_ID: u8 = 0;
 pub const BLOB_DATA_PACKET_TYPE_ID: u8 = 1;

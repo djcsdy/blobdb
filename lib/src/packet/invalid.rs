@@ -1,4 +1,4 @@
-use crate::lib::packet::RawPacket;
+use crate::packet::RawPacket;
 
 pub struct InvalidPacket(pub(super) RawPacket);
 

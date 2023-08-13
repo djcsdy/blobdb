@@ -1,7 +1,7 @@
-use crate::lib::blob::BlobId;
-use crate::lib::block::{Block, Blockified, Blockifier, BlockifierFinalizer};
-use crate::lib::db::DbId;
-use crate::lib::file::path::{blob_file_path, temp_dir_path};
+use crate::blob::BlobId;
+use crate::block::{Block, Blockified, Blockifier, BlockifierFinalizer};
+use crate::db::DbId;
+use crate::file::path::{blob_file_path, temp_dir_path};
 use std::io::{Read, Result, Seek, SeekFrom, Write};
 use std::path::Path;
 use tempfile::{NamedTempFile, PersistError};

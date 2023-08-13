@@ -75,13 +75,20 @@ version = "0.1.0"
 dependencies = [
  "arrayref",
  "byteorder",
- "clap",
  "fs2",
  "hex",
  "itertools",
  "sha2",
  "tee_readwrite",
  "tempfile",
+]
+
+[[package]]
+name = "blobdb-cli"
+version = "0.1.0"
+dependencies = [
+ "blobdb",
+ "clap",
 ]
 
 [[package]]

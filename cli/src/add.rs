@@ -1,6 +1,5 @@
-use crate::cli::options::AddOptions;
-use crate::lib::Db;
-use crate::lib::FsDb;
+use crate::options::AddOptions;
+use blobdb::{Db, FsDb};
 use std::fs::File;
 use std::path::Path;
 

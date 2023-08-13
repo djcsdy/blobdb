@@ -1,4 +1,4 @@
-use crate::lib::blob::BlobId;
+use crate::blob::BlobId;
 use hex;
 use std::path::{Path, PathBuf};
 

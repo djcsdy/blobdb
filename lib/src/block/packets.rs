@@ -1,6 +1,6 @@
-use crate::lib::block::block::Block;
-use crate::lib::packet::Packet;
-use crate::lib::packet::RawPacket;
+use crate::block::block::Block;
+use crate::packet::Packet;
+use crate::packet::RawPacket;
 
 pub struct Packets {
     block: Block,

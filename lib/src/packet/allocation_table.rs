@@ -1,8 +1,8 @@
-use crate::lib::packet::raw::MAX_PAYLOAD_SIZE;
-use crate::lib::packet::type_id_and_length::{
+use crate::packet::raw::MAX_PAYLOAD_SIZE;
+use crate::packet::type_id_and_length::{
     RANDOM_ALLOCATION_TABLE_PACKET_TYPE_ID, SEQUENTIAL_ALLOCATION_TABLE_PACKET_TYPE_ID,
 };
-use crate::lib::packet::RawPacket;
+use crate::packet::RawPacket;
 use arrayref::array_ref;
 use byteorder::{ByteOrder, LittleEndian};
 use std::mem::size_of;

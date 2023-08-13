@@ -1,4 +1,4 @@
-use crate::lib::block::Block;
+use crate::block::Block;
 
 pub trait Blockifier<FinalizeData, Finalizer: BlockifierFinalizer<FinalizeData>> {
     fn next_block(&mut self) -> Blockified<FinalizeData>;

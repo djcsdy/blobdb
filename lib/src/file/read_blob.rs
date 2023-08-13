@@ -1,6 +1,6 @@
-use crate::lib::block::{Block, Packets};
-use crate::lib::packet::Packet;
-use crate::lib::{BlobId, DbId};
+use crate::block::{Block, Packets};
+use crate::packet::Packet;
+use crate::{BlobId, DbId};
 use itertools::Itertools;
 use std::cmp::min;
 use std::collections::VecDeque;

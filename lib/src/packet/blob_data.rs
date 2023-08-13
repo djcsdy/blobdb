@@ -7,12 +7,12 @@ use byteorder::{ByteOrder, LittleEndian};
 use sha2::{Digest, Sha256};
 use tee_readwrite::TeeReader;
 
-use crate::lib::blob::{BlobId, BLOB_ID_SIZE};
-use crate::lib::io::ReadExt;
-use crate::lib::packet::packetizer::{Packetized, Packetizer, PacketizerFinalizer};
-use crate::lib::packet::raw::{MAX_PAYLOAD_SIZE, PAYLOAD_OFFSET};
-use crate::lib::packet::type_id_and_length::BLOB_DATA_PACKET_TYPE_ID;
-use crate::lib::packet::{Packet, RawPacket};
+use crate::blob::{BlobId, BLOB_ID_SIZE};
+use crate::io::ReadExt;
+use crate::packet::packetizer::{Packetized, Packetizer, PacketizerFinalizer};
+use crate::packet::raw::{MAX_PAYLOAD_SIZE, PAYLOAD_OFFSET};
+use crate::packet::type_id_and_length::BLOB_DATA_PACKET_TYPE_ID;
+use crate::packet::{Packet, RawPacket};
 
 pub const BLOB_DATA_PACKET_OVERHEAD: usize = PAYLOAD_OFFSET + BLOB_DATA_OFFSET;
 

@@ -4,11 +4,11 @@ use std::mem::size_of;
 
 use byteorder::{ByteOrder, LittleEndian, ReadBytesExt, WriteBytesExt};
 
-use crate::lib::block::ONE_PACKET_MAX_SIZE;
-use crate::lib::packet::blob_data::BlobDataPacket;
-use crate::lib::packet::invalid::InvalidPacket;
-use crate::lib::packet::packet::Packet;
-use crate::lib::packet::type_id_and_length::{
+use crate::block::ONE_PACKET_MAX_SIZE;
+use crate::packet::blob_data::BlobDataPacket;
+use crate::packet::invalid::InvalidPacket;
+use crate::packet::packet::Packet;
+use crate::packet::type_id_and_length::{
     combine_type_id_and_length, extract_length, extract_type_id,
 };
 
