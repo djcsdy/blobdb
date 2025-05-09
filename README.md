@@ -19,6 +19,9 @@ implementation is experimental and does not yet match the documentation.
  * **Highly recoverable**: Blobs can be stored with configurable levels of
    redundancy. All data is stored in a format that maximizes recoverability in
    the event of data corruption or media failure.
+ * **Durability**: Changes are journaled to ensure atomicity and durability.
+   This guarantees that the database remains consistent even in the event of
+   crashes or power failures.
  * **Storage Medium Agnostic**: Databases can be stored in a directory within a
    standard POSIX filesystem, or directly on raw block devices.
  * **Orthogonal Design**, **No Artificial Size Limitations**: Both keys and
