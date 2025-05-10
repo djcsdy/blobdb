@@ -85,7 +85,7 @@ these benefits.
 
 ## Volume
 
-A physical or logical storage medium that can host any number of Databases.
+A physical or logical storage medium used to host any number of Databases.
 
 A Volume is the foundational storage layer of BlobDB. It abstracts the
 underlying storage mechanism, which can be either:
@@ -95,7 +95,7 @@ underlying storage mechanism, which can be either:
 * **Block Device**: A raw block device formatted for BlobDB use.
 
 Each Volume may host multiple independent Databases. A single Database may also
-divide its storage across multiple Volumes.
+be hosted by multiple Volumes.
 
 Volumes are independent of one another. There is no automatic guarantee of
 consistency between Volumes except as provided by the Databases hosted by those
