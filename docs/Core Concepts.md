@@ -74,12 +74,13 @@ implemented and enforced by a journaling system within the Database.
 Databases are independent of one another. There is no automatic guarantee of
 consistency between Databases.
 
-The user specifies which Volumes will host a Database when they create the
-Database. The user may also reconfigure which Volumes host a running Database,
-capacity permitting.
+The user specifies which Volumes will host a Database at the time of its
+creation. The user may also reconfigure which Volumes host a running Database,
+provided the Volumes have enough capacity to support the reconfiguration.
 
-Hosting a Database on more than one Volume can be used to increase capacity and
-performance and also provides additional durability options.
+Spreading a Database across multiple Volumes offers benefits such as increased
+capacity, improved performance (through parallel operations), and additional
+durability options in case of Volume failure.
 
 ## Volume
 
