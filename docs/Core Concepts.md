@@ -1,37 +1,91 @@
 # Core Concepts
 
-* **Blob**: An immutable sequence of zero or more bytes. Blobs serve as both
-  Keys and Values in BlobDB, and are stored at the Database level. A Blob
-  persists in the Database only as long as it is referenced by at least one
-  Key-Value mapping in any Index.
+## Blob
 
-* **Ordering**: A set of rules that determine how Keys are lexicographically
-  ordered. Orderings can be user-defined, or one of the built-in orderings:
+An immutable sequence of zero or more bytes.
 
-   * **Bytewise**: Lexicographic ordering by byte values.
+Blobs are stored within a Database. A Blob persists only as long as it is
+referenced by at least one Key-Value Mapping in any Index.
 
-   * **UTF-8**: Lexicographic ordering by Unicode codepoints, treating the
-     Blob as a UTF-8 encoded string.
+## Key
 
-* **Database**: A collection of Blobs along with zero or more Indexes that
-  maintain ordered Key-Value mappings between these Blobs. Blobs are automatically
-  removed from the Database when they are no longer referenced by any Index.
+A Blob that serves as an identifier in a Key-Value Mapping.
 
-* **Index**: An ordered collection of Key-Value mappings with an associated
-  Ordering, where:
+Within an Index, each Key must be unique, but the same Key may be present in
+any number of Indexes. Within an Index, Keys are sorted and compared using the
+Ordering configured for that Index.
 
-   * Keys and Values are references to Blobs stored in the Database.
+## Value
 
-   * Each Key maps to exactly one Value.
+A Blob that stores data in a Key-Value Mapping.
 
-   * Keys are sorted and compared according to the Index's Ordering.
+Unlike Keys, Values have no inherent ordering. The same Value may be mapped by
+any number of Keys in any number of Indexes.
 
-   * Each Index operates independently with no consistency guarantees relative
-     to other Indexes.
+## Ordering
 
-* **Volume**: A storage medium that can host zero or more Databases. A Volume
-  can be either:
- 
-   * A directory in a POSIX filesystem containing a BlobDB file hierarchy.
+A rule that defines a lexicographic ordering of Keys.
 
-   * A raw block device formatted for BlobDB.
+BlobDB provides the following built-in Orderings:
+
+* **Bytewise**: Keys are ordered lexicographically based on byte values.
+* **UTF-8**: Keys are treated as UTF-8 strings and ordered lexicographically
+  based on Unicode code points.
+
+The user can also provide their own implementations of custom Orderings.
+
+## Key-Value Mapping
+
+Defines a many-to-one relationship within an Index where a Key maps to a
+specified Value.
+
+A Key-Value Mapping relates the Key and Value by reference. The Key and Value
+are both Blobs stored within the same Database as the Index.
+
+## Index
+
+An ordered collection of Key-Value Mappings within a Database.
+
+Each Index has an associated Ordering. Within the Index, Key-Value Mappings are
+stored in the order of their Keys as defined by the associated Ordering.
+
+The structure of an Index makes it possible to efficiently look up a Value
+given the Key that maps to that value. It is also possible to efficiently
+iterate through the Key-Value mappings in forward or reverse order as defined by
+the associated Ordering.
+
+Within an Index, each Key must be unique, but the same Value may be mapped by
+any number of Keys.
+
+Indexes are independent of one another. There is no automatic guarantee of
+consistency between Indexes.
+
+## Database
+
+A logical container of Blobs and Indexes, stored across one or more Volumes.
+
+A Blob persists within a Database only as long as it is referenced by at least
+one Key-Value mapping in any Index. Each Blob is stored once within the
+Database even if it is referenced multiple times.
+
+A Database provides atomicity and consistency guarantees. These guarantees are
+implemented and enforced by a journaling system within the Database.
+
+Databases are independent of one another. There is no automatic guarantee of
+consistency between Databases.
+
+## Volume
+
+A physical or logical storage medium that can host any number of Databases.
+
+A Volume is the foundational storage layer of BlobDB. It abstracts the
+underlying storage mechanism, which can be either:
+
+* **Filesystem**: A directory hierarchy within a POSIX filesystem used to store
+  BlobDB data in an opaque binary format.
+* **Block Device**: A raw block device formatted for BlobDB use.
+
+Each Volume may host multiple independent Databases, with each Database
+maintaining its own Blobs, Indexes, and its own consistency and atomicity
+guarantees. A single Database may also divide its storage across multiple
+Volumes.
