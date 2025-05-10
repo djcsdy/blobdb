@@ -62,7 +62,7 @@ consistency between Indexes.
 
 ## Database
 
-A logical container of Blobs and Indexes, stored across one or more Volumes.
+A logical container of Blobs and Indexes, hosted on one or more Volumes.
 
 A Blob persists within a Database only as long as it is referenced by at least
 one Key-Value mapping in any Index. Each Blob is stored once within the
@@ -73,6 +73,13 @@ implemented and enforced by a journaling system within the Database.
 
 Databases are independent of one another. There is no automatic guarantee of
 consistency between Databases.
+
+The user specifies which Volumes will host a Database when they create the
+Database. The user may also reconfigure which Volumes host a running Database,
+capacity permitting.
+
+Hosting a Database on more than one Volume can be used to increase capacity and
+performance and also provides additional durability options.
 
 ## Volume
 
@@ -85,7 +92,9 @@ underlying storage mechanism, which can be either:
   BlobDB data in an opaque binary format.
 * **Block Device**: A raw block device formatted for BlobDB use.
 
-Each Volume may host multiple independent Databases, with each Database
-maintaining its own Blobs, Indexes, and its own consistency and atomicity
-guarantees. A single Database may also divide its storage across multiple
+Each Volume may host multiple independent Databases. A single Database may also
+divide its storage across multiple Volumes.
+
+Volumes are independent of one another. There is no automatic guarantee of
+consistency between Volumes except as provided by the Databases hosted by those
 Volumes.
