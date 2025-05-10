@@ -78,9 +78,10 @@ The user specifies which Volumes will host a Database at the time of its
 creation. The user may also reconfigure which Volumes host a running Database,
 provided the Volumes have enough capacity to support the reconfiguration.
 
-Spreading a Database across multiple Volumes offers benefits such as increased
-capacity, improved performance (through parallel operations), and additional
-durability options in case of Volume failure.
+When a Database is hosted on multiple Volumes, the user can configure it to
+use the extra Volumes for increased capacity, better performance (via parallel
+operations), enhanced redundancy against media failure, or a combination of
+these benefits.
 
 ## Volume
 
