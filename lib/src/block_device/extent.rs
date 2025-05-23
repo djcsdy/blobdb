@@ -1,5 +1,3 @@
-use std::cmp::Ordering;
-
 #[derive(Eq, PartialEq, Clone, Copy, Hash, Debug)]
 pub struct Extent {
     pub first_block_index: u64,
