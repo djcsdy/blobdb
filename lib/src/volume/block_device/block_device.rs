@@ -1,5 +1,6 @@
 use crate::block::Block;
 use crate::volume::block_device::allocation_tree::AllocationTree;
+use crate::volume::block_device::block_group_count::BlockGroupCount;
 use crate::volume::block_device::ioctl;
 use linux_raw_sys::general::{S_IFBLK, S_IFMT};
 use rustix::fs;
@@ -40,8 +41,10 @@ impl BlockDevice {
             physical_block_size / 4096
         };
 
-        let block_count = ioctl::ioctl_blkgetsize(&fd)? / Block::SIZE as u64;
-        let allocation_tree = AllocationTree::new(block_count);
+        let block_group_count = BlockGroupCount(
+            ioctl::ioctl_blkgetsize(&fd)? / (Block::SIZE as u64 * block_group_size as u64),
+        );
+        let allocation_tree = AllocationTree::new(block_group_count);
 
         // TODO
 

@@ -1,6 +1,7 @@
 use crate::volume::block_device::block_group_count::BlockGroupCount;
 use derive_more::{Add, AddAssign, Deref, DerefMut, Display, From, Into, Sub, SubAssign};
 use std::cmp::Ordering;
+use std::ops::Add;
 
 #[derive(
     Eq,
@@ -23,6 +24,14 @@ use std::cmp::Ordering;
 )]
 #[display("Block Group {_0}")]
 pub struct BlockGroupIndex(pub u64);
+
+impl Add<BlockGroupCount> for BlockGroupIndex {
+    type Output = Self;
+
+    fn add(self, rhs: BlockGroupCount) -> Self {
+        Self((*self).add(*rhs))
+    }
+}
 
 impl PartialEq<BlockGroupCount> for BlockGroupIndex {
     fn eq(&self, other: &BlockGroupCount) -> bool {
