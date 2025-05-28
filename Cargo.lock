@@ -73,6 +73,8 @@ dependencies = [
  "fs2",
  "hex",
  "itertools",
+ "linux-raw-sys",
+ "rustix",
  "sha2",
  "tee_readwrite",
  "tempfile",
