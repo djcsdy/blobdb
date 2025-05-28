@@ -1,4 +1,4 @@
-use crate::block_device::allocation_tree::AllocationTree;
+use crate::volume::block_device::allocation_tree::AllocationTree;
 
 #[test]
 fn single_allocation() {

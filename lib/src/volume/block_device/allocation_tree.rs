@@ -1,4 +1,4 @@
-use crate::block_device::extent::Extent;
+use crate::volume::block_device::extent::Extent;
 use std::collections::BTreeMap;
 
 #[derive(Clone, Debug)]

@@ -1,6 +1,6 @@
 use crate::block::Block;
-use crate::block_device::allocation_tree::AllocationTree;
-use crate::block_device::ioctl;
+use crate::volume::block_device::allocation_tree::AllocationTree;
+use crate::volume::block_device::ioctl;
 use linux_raw_sys::general::{S_IFBLK, S_IFMT};
 use rustix::fs;
 use rustix::fs::{Mode, OFlags};
