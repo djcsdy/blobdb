@@ -1,6 +1,7 @@
 use crate::block_device::extent::Extent;
 use std::collections::BTreeMap;
 
+#[derive(Clone, Debug)]
 pub struct AllocationTree {
     free_block_count: u64,
     free_extent_block_counts_by_first_block_index: BTreeMap<u64, u64>,
