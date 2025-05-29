@@ -1,8 +1,6 @@
 use crate::block::Block;
+use crate::units::{BlockCount, BlockGroupCount, ByteCount};
 use crate::volume::block_device::allocation_tree::AllocationTree;
-use crate::volume::block_device::block_count::BlockCount;
-use crate::volume::block_device::block_group_count::BlockGroupCount;
-use crate::volume::block_device::byte_count::ByteCount;
 use crate::volume::block_device::ioctl;
 use linux_raw_sys::general::{S_IFBLK, S_IFMT};
 use rustix::fs;

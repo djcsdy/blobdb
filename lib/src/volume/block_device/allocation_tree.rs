@@ -1,5 +1,5 @@
-use crate::volume::block_device::block_group_count::BlockGroupCount;
-use crate::volume::block_device::block_group_index::BlockGroupIndex;
+use crate::units::BlockGroupCount;
+use crate::units::BlockGroupIndex;
 use crate::volume::block_device::extent::Extent;
 use std::collections::BTreeMap;
 

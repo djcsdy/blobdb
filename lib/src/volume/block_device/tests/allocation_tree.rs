@@ -1,6 +1,6 @@
+use crate::units::BlockGroupCount;
+use crate::units::BlockGroupIndex;
 use crate::volume::block_device::allocation_tree::AllocationTree;
-use crate::volume::block_device::block_group_count::BlockGroupCount;
-use crate::volume::block_device::block_group_index::BlockGroupIndex;
 
 #[test]
 fn single_allocation() {

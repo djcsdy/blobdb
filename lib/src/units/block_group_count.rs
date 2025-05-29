@@ -1,4 +1,4 @@
-use crate::volume::block_device::block_group_index::BlockGroupIndex;
+use crate::units::block_group_index::BlockGroupIndex;
 use derive_more::{Add, AddAssign, Deref, DerefMut, Display, From, Into, Sub, SubAssign};
 use std::cmp::Ordering;
 
