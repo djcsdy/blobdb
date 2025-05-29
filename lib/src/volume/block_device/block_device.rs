@@ -1,6 +1,7 @@
 use crate::block::Block;
 use crate::volume::block_device::allocation_tree::AllocationTree;
 use crate::volume::block_device::block_group_count::BlockGroupCount;
+use crate::volume::block_device::byte_count::ByteCount;
 use crate::volume::block_device::ioctl;
 use linux_raw_sys::general::{S_IFBLK, S_IFMT};
 use rustix::fs;
@@ -10,7 +11,7 @@ use rustix::path;
 
 #[derive(Debug)]
 pub struct BlockDevice {
-    physical_block_size: u32,
+    physical_block_size: ByteCount<u32>,
     block_group_size: u32,
     allocation_tree: AllocationTree,
 }
@@ -30,15 +31,15 @@ impl BlockDevice {
             return Err(rustix::io::Errno::NOTBLK);
         }
 
-        let physical_block_size = fs::ioctl_blkpbszget(&fd)?;
+        let physical_block_size = ByteCount(fs::ioctl_blkpbszget(&fd)?);
         if !Self::is_valid_physical_block_size(physical_block_size) {
             return Err(rustix::io::Errno::INVAL);
         }
 
-        let block_group_size = if physical_block_size < 4096 {
+        let block_group_size = if physical_block_size < ByteCount(4096) {
             1
         } else {
-            physical_block_size / 4096
+            *physical_block_size / 4096
         };
 
         let block_group_count = BlockGroupCount(
@@ -55,7 +56,7 @@ impl BlockDevice {
         })
     }
 
-    fn is_valid_physical_block_size(block_size: u32) -> bool {
-        block_size >= 512 && block_size.is_power_of_two()
+    fn is_valid_physical_block_size(block_size: ByteCount<u32>) -> bool {
+        block_size >= ByteCount(512) && block_size.is_power_of_two()
     }
 }
