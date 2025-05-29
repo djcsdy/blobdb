@@ -1,5 +1,6 @@
 use crate::block::Block;
 use crate::volume::block_device::allocation_tree::AllocationTree;
+use crate::volume::block_device::block_count::BlockCount;
 use crate::volume::block_device::block_group_count::BlockGroupCount;
 use crate::volume::block_device::byte_count::ByteCount;
 use crate::volume::block_device::ioctl;
@@ -12,7 +13,7 @@ use rustix::path;
 #[derive(Debug)]
 pub struct BlockDevice {
     physical_block_size: ByteCount<u32>,
-    block_group_size: u32,
+    block_group_size: BlockCount<u32>,
     allocation_tree: AllocationTree,
 }
 
@@ -36,14 +37,14 @@ impl BlockDevice {
             return Err(rustix::io::Errno::INVAL);
         }
 
-        let block_group_size = if physical_block_size < ByteCount(4096) {
+        let block_group_size = BlockCount(if physical_block_size < ByteCount(4096) {
             1
         } else {
             *physical_block_size / 4096
-        };
+        });
 
         let block_group_count = BlockGroupCount(
-            ioctl::ioctl_blkgetsize(&fd)? / (Block::SIZE as u64 * block_group_size as u64),
+            ioctl::ioctl_blkgetsize(&fd)? / (Block::SIZE as u64 * (*block_group_size as u64)),
         );
         let allocation_tree = AllocationTree::new(block_group_count);
 
