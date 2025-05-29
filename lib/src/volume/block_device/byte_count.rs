@@ -1,4 +1,5 @@
 use derive_more::{Add, AddAssign, Deref, DerefMut, Display, From, Sub, SubAssign};
+use num_traits::{PrimInt, Unsigned};
 use std::fmt::Display;
 
 #[derive(
@@ -22,7 +23,7 @@ use std::fmt::Display;
 #[display("{_0} bytes")]
 pub struct ByteCount<T>(pub T)
 where
-    T: Copy + Ord + Display;
+    T: Unsigned + PrimInt + Display;
 
 impl From<ByteCount<u32>> for u32 {
     fn from(value: ByteCount<u32>) -> Self {
