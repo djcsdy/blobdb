@@ -32,7 +32,7 @@ impl BlockDevice {
         }
 
         let physical_block_size = ByteCount(fs::ioctl_blkpbszget(&fd)?);
-        if !Self::is_valid_physical_block_size(physical_block_size) {
+        if !physical_block_size.is_power_of_two() {
             return Err(rustix::io::Errno::INVAL);
         }
 
@@ -54,9 +54,5 @@ impl BlockDevice {
             block_group_size,
             allocation_tree,
         })
-    }
-
-    fn is_valid_physical_block_size(block_size: ByteCount<u32>) -> bool {
-        block_size >= ByteCount(512) && block_size.is_power_of_two()
     }
 }
