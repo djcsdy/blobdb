@@ -10,8 +10,8 @@ use rustix::path;
 
 #[derive(Debug)]
 pub struct BlockDevice {
-    physical_block_size: ByteCount<u32>,
-    block_group_size: BlockCount<u32>,
+    physical_block_size: ByteCount,
+    block_group_size: BlockCount,
     allocation_tree: AllocationTree,
 }
 
@@ -30,7 +30,7 @@ impl BlockDevice {
             return Err(rustix::io::Errno::NOTBLK);
         }
 
-        let physical_block_size = ByteCount(fs::ioctl_blkpbszget(&fd)?);
+        let physical_block_size = ByteCount(fs::ioctl_blkpbszget(&fd)? as u64);
         if !physical_block_size.is_power_of_two() {
             return Err(rustix::io::Errno::INVAL);
         }
