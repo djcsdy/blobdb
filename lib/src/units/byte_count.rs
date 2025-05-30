@@ -1,3 +1,5 @@
+use crate::block::Block;
+use crate::units::BlockCount;
 use derive_more::{Add, AddAssign, Deref, DerefMut, Display, From, Sub, SubAssign};
 use num_traits::{PrimInt, Unsigned};
 use std::fmt::Display;
@@ -34,5 +36,14 @@ impl From<ByteCount<u32>> for u32 {
 impl From<ByteCount<u64>> for u64 {
     fn from(value: ByteCount<u64>) -> Self {
         value.0
+    }
+}
+
+impl<T> ByteCount<T>
+where
+    T: Unsigned + PrimInt + Display,
+{
+    pub fn to_block_count(self) -> BlockCount<T> {
+        BlockCount(*self / T::from(*Block::SIZE).unwrap())
     }
 }

@@ -35,11 +35,7 @@ impl BlockDevice {
             return Err(rustix::io::Errno::INVAL);
         }
 
-        let block_group_size = BlockCount(if physical_block_size < ByteCount(4096) {
-            1
-        } else {
-            *physical_block_size / 4096
-        });
+        let block_group_size = physical_block_size.to_block_count().max(BlockCount(1));
 
         let block_group_count = BlockGroupCount(
             ioctl::ioctl_blkgetsize(&fd)? / (*Block::SIZE * (*block_group_size as u64)),
