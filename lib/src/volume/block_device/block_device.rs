@@ -1,5 +1,4 @@
-use crate::block::Block;
-use crate::units::{BlockCount, BlockGroupCount, ByteCount};
+use crate::units::{BlockCount, ByteCount};
 use crate::volume::block_device::allocation_tree::AllocationTree;
 use crate::volume::block_device::ioctl;
 use linux_raw_sys::general::{S_IFBLK, S_IFMT};
@@ -36,10 +35,8 @@ impl BlockDevice {
         }
 
         let block_group_size = physical_block_size.to_block_count().max(BlockCount(1));
-
-        let block_group_count = BlockGroupCount(
-            ioctl::ioctl_blkgetsize(&fd)? / (*Block::SIZE * (*block_group_size as u64)),
-        );
+        let block_group_count =
+            ByteCount(ioctl::ioctl_blkgetsize(&fd)?).to_block_group_count(block_group_size);
         let allocation_tree = AllocationTree::new(block_group_count);
 
         // TODO
