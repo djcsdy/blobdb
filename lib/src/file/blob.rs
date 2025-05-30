@@ -12,7 +12,7 @@ pub fn import_blob<R: Read>(db_id: DbId, base_path: &Path, reader: R) -> Result<
     let mut block_count: u64 = 0;
 
     while let Blockified::Block { block, .. } = blockifier.next_block() {
-        if block_count >= u64::MAX / (Block::SIZE as u64) {
+        if block_count >= u64::MAX / *Block::SIZE {
             panic!();
         }
 

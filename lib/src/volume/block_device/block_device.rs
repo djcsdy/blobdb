@@ -42,7 +42,7 @@ impl BlockDevice {
         });
 
         let block_group_count = BlockGroupCount(
-            ioctl::ioctl_blkgetsize(&fd)? / (Block::SIZE as u64 * (*block_group_size as u64)),
+            ioctl::ioctl_blkgetsize(&fd)? / (*Block::SIZE * (*block_group_size as u64)),
         );
         let allocation_tree = AllocationTree::new(block_group_count);
 

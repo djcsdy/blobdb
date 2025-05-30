@@ -10,6 +10,7 @@ use crate::block::signature::{BLOCK_SIGNATURE_SIZE, BlockArity, BlockSignature};
 use crate::db::{DB_ID_SIZE, DbId};
 use crate::packet::Packet;
 use crate::packet::RawPacket;
+use crate::units::ByteCount;
 use std::mem::size_of;
 
 const BLOCK_SIZE: usize = 4096;
@@ -32,7 +33,7 @@ const MANY_PACKETS_OFFSET: usize = PACKET_COUNT_OFFSET + PACKET_COUNT_SIZE;
 pub struct Block(pub(super) [u8; BLOCK_SIZE]);
 
 impl Block {
-    pub const SIZE: usize = BLOCK_SIZE;
+    pub const SIZE: ByteCount<u64> = ByteCount(BLOCK_SIZE as u64);
 
     pub fn new<P: Into<Packet>>(db_id: DbId, packets: Vec<P>) -> Block {
         let mut buffer = [0; BLOCK_SIZE];
