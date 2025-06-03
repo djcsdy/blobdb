@@ -160,3 +160,80 @@ fn overlaps() {
     assert!(extent1.overlaps(extent2));
     assert!(extent2.overlaps(extent1));
 }
+
+#[test]
+fn contains() {
+    // Test complete containment
+    let outer = Extent {
+        first_block_group_index: BlockGroupIndex(10),
+        block_group_count: BlockGroupCount(10),
+    };
+    let inner = Extent {
+        first_block_group_index: BlockGroupIndex(12),
+        block_group_count: BlockGroupCount(3),
+    };
+    assert!(outer.contains(inner));
+    assert!(!inner.contains(outer));
+
+    // Test extent contains itself
+    let extent = Extent {
+        first_block_group_index: BlockGroupIndex(10),
+        block_group_count: BlockGroupCount(5),
+    };
+    assert!(extent.contains(extent));
+
+    // Test partial overlap (should not contain)
+    let extent1 = Extent {
+        first_block_group_index: BlockGroupIndex(10),
+        block_group_count: BlockGroupCount(5),
+    };
+    let extent2 = Extent {
+        first_block_group_index: BlockGroupIndex(13),
+        block_group_count: BlockGroupCount(5),
+    };
+    assert!(!extent1.contains(extent2));
+    assert!(!extent2.contains(extent1));
+
+    // Test completely separate extents
+    let extent1 = Extent {
+        first_block_group_index: BlockGroupIndex(10),
+        block_group_count: BlockGroupCount(5),
+    };
+    let extent2 = Extent {
+        first_block_group_index: BlockGroupIndex(20),
+        block_group_count: BlockGroupCount(3),
+    };
+    assert!(!extent1.contains(extent2));
+    assert!(!extent2.contains(extent1));
+
+    // Test adjacent extents
+    let extent1 = Extent {
+        first_block_group_index: BlockGroupIndex(10),
+        block_group_count: BlockGroupCount(5),
+    };
+    let extent2 = Extent {
+        first_block_group_index: BlockGroupIndex(15),
+        block_group_count: BlockGroupCount(3),
+    };
+    assert!(!extent1.contains(extent2));
+    assert!(!extent2.contains(extent1));
+
+    // Test containment at boundaries
+    let outer = Extent {
+        first_block_group_index: BlockGroupIndex(10),
+        block_group_count: BlockGroupCount(5),
+    };
+    let inner = Extent {
+        first_block_group_index: BlockGroupIndex(10),
+        block_group_count: BlockGroupCount(3),
+    };
+    assert!(outer.contains(inner));
+    assert!(!inner.contains(outer));
+
+    let inner2 = Extent {
+        first_block_group_index: BlockGroupIndex(12),
+        block_group_count: BlockGroupCount(3),
+    };
+    assert!(outer.contains(inner2));
+    assert!(!inner2.contains(outer));
+}

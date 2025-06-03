@@ -56,4 +56,9 @@ impl Extent {
             || (self.first_block_group_index > other.first_block_group_index
                 && self.first_block_group_index < other.end_block_group_index())
     }
+
+    pub fn contains(self, other: Self) -> bool {
+        self.first_block_group_index <= other.first_block_group_index
+            && self.end_block_group_index() >= other.end_block_group_index()
+    }
 }
