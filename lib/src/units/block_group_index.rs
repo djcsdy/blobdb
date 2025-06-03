@@ -1,7 +1,7 @@
 use crate::units::block_group_count::BlockGroupCount;
 use derive_more::{Add, AddAssign, Deref, DerefMut, Display, From, Into, Sub, SubAssign};
 use std::cmp::Ordering;
-use std::ops::Add;
+use std::ops::{Add, Shr};
 
 #[derive(
     Eq,
@@ -58,5 +58,13 @@ impl PartialOrd<BlockGroupCount> for BlockGroupIndex {
 
     fn ge(&self, other: &BlockGroupCount) -> bool {
         (**self).ge(&**other)
+    }
+}
+
+impl Shr<u64> for BlockGroupIndex {
+    type Output = Self;
+
+    fn shr(self, rhs: u64) -> Self {
+        Self(*self >> rhs)
     }
 }
