@@ -1,7 +1,9 @@
 use crate::units::BlockGroupCount;
 use crate::units::BlockGroupIndex;
+use derive_more::Display;
 
-#[derive(Eq, PartialEq, Clone, Copy, Hash, Debug)]
+#[derive(Eq, PartialEq, Clone, Copy, Hash, Debug, Display)]
+#[display("Extent of Block Groups {}..{}", *first_block_group_index, *self.end_block_group_index())]
 pub struct Extent {
     pub first_block_group_index: BlockGroupIndex,
     pub block_group_count: BlockGroupCount,
