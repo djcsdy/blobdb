@@ -1,5 +1,5 @@
-use crate::units::BlockGroupCount;
 use crate::units::BlockGroupIndex;
+use crate::units::{BlockGroupCount, Count};
 use derive_more::Display;
 
 #[derive(Eq, PartialEq, Clone, Copy, Hash, Debug, Display)]
@@ -60,5 +60,33 @@ impl Extent {
     pub fn contains(self, other: Self) -> bool {
         self.first_block_group_index <= other.first_block_group_index
             && self.end_block_group_index() >= other.end_block_group_index()
+    }
+
+    pub fn reserve(self, other: Self) -> (Option<Self>, Option<Self>) {
+        if !self.contains(other) {
+            panic!("{} does not contain {}", self, other);
+        }
+
+        let before = if self.first_block_group_index < other.first_block_group_index {
+            Some(Extent {
+                first_block_group_index: self.first_block_group_index,
+                block_group_count: (self.first_block_group_index..other.first_block_group_index)
+                    .count(),
+            })
+        } else {
+            None
+        };
+
+        let after = if other.end_block_group_index() < self.end_block_group_index() {
+            Some(Extent {
+                first_block_group_index: other.end_block_group_index(),
+                block_group_count: (other.end_block_group_index()..self.end_block_group_index())
+                    .count(),
+            })
+        } else {
+            None
+        };
+
+        (before, after)
     }
 }

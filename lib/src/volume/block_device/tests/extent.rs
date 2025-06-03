@@ -237,3 +237,105 @@ fn contains() {
     assert!(outer.contains(inner2));
     assert!(!inner2.contains(outer));
 }
+
+#[test]
+fn reserve() {
+    // Test reserving in the middle
+    let extent = Extent {
+        first_block_group_index: BlockGroupIndex(10),
+        block_group_count: BlockGroupCount(10),
+    };
+    let (before, after) = extent.reserve(Extent {
+        first_block_group_index: BlockGroupIndex(13),
+        block_group_count: BlockGroupCount(4),
+    });
+
+    assert_eq!(
+        before,
+        Some(Extent {
+            first_block_group_index: BlockGroupIndex(10),
+            block_group_count: BlockGroupCount(3),
+        })
+    );
+    assert_eq!(
+        after,
+        Some(Extent {
+            first_block_group_index: BlockGroupIndex(17),
+            block_group_count: BlockGroupCount(3),
+        })
+    );
+
+    // Test reserving at the start
+    let extent = Extent {
+        first_block_group_index: BlockGroupIndex(10),
+        block_group_count: BlockGroupCount(10),
+    };
+    let (before, after) = extent.reserve(Extent {
+        first_block_group_index: BlockGroupIndex(10),
+        block_group_count: BlockGroupCount(4),
+    });
+
+    assert_eq!(before, None);
+    assert_eq!(
+        after,
+        Some(Extent {
+            first_block_group_index: BlockGroupIndex(14),
+            block_group_count: BlockGroupCount(6),
+        })
+    );
+
+    // Test reserving at the end
+    let extent = Extent {
+        first_block_group_index: BlockGroupIndex(10),
+        block_group_count: BlockGroupCount(10),
+    };
+    let (before, after) = extent.reserve(Extent {
+        first_block_group_index: BlockGroupIndex(16),
+        block_group_count: BlockGroupCount(4),
+    });
+
+    assert_eq!(
+        before,
+        Some(Extent {
+            first_block_group_index: BlockGroupIndex(10),
+            block_group_count: BlockGroupCount(6),
+        })
+    );
+    assert_eq!(after, None);
+
+    // Test reserving the whole extent
+    let extent = Extent {
+        first_block_group_index: BlockGroupIndex(10),
+        block_group_count: BlockGroupCount(10),
+    };
+    let (before, after) = extent.reserve(extent);
+
+    assert_eq!(before, None);
+    assert_eq!(after, None);
+}
+
+#[test]
+#[should_panic(expected = "does not contain")]
+fn reserve_not_contained() {
+    let extent = Extent {
+        first_block_group_index: BlockGroupIndex(10),
+        block_group_count: BlockGroupCount(5),
+    };
+    extent.reserve(Extent {
+        first_block_group_index: BlockGroupIndex(8),
+        block_group_count: BlockGroupCount(3),
+    }); // should panic
+}
+
+#[test]
+#[should_panic(expected = "does not contain")]
+fn reserve_partially_contained() {
+    let extent = Extent {
+        first_block_group_index: BlockGroupIndex(10),
+        block_group_count: BlockGroupCount(5),
+    };
+    extent.reserve(Extent {
+        first_block_group_index: BlockGroupIndex(12),
+        block_group_count: BlockGroupCount(5),
+    }); // should panic
+}
