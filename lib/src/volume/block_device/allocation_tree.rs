@@ -69,6 +69,21 @@ impl AllocationTree {
         self.insert(extent)
     }
 
+    pub(super) fn reserve(&mut self, extent: Extent) {
+        if let Some(extent_before) = self.extent_before(extent.first_block_group_index) {
+            if extent_before.overlaps(extent) {
+                self.remove(extent_before);
+                let (extent_before, extent_after) = extent_before.reserve(extent);
+                extent_before.map(|before| self.insert(before));
+                extent_after.map(|after| self.insert(after));
+            } else {
+                panic!("Cannot reserve already allocated extent");
+            }
+        } else {
+            panic!("Cannot reserve already allocated extent");
+        }
+    }
+
     fn allocate_at_least(&mut self, block_group_count: BlockGroupCount) -> Option<Extent> {
         if block_group_count == BlockGroupCount(0) {
             None
@@ -145,7 +160,7 @@ impl AllocationTree {
 
     fn extent_before(&mut self, block_group_index: BlockGroupIndex) -> Option<Extent> {
         self.free_extent_block_group_counts_by_first_block_group_index
-            .range(..block_group_index)
+            .range(..=block_group_index)
             .map(|(&first_block_index, &block_count)| Extent {
                 first_block_group_index: first_block_index,
                 block_group_count: block_count,

@@ -1,6 +1,7 @@
 use crate::units::BlockGroupCount;
 use crate::units::BlockGroupIndex;
 use crate::volume::block_device::allocation_tree::AllocationTree;
+use crate::volume::block_device::extent::Extent;
 
 #[test]
 fn single_allocation() {
@@ -164,4 +165,95 @@ fn test_free_block_count() {
     // Deallocate the second block and verify all blocks are free
     tree.deallocate(block2);
     assert_eq!(tree.free_block_group_count(), BlockGroupCount(100));
+}
+#[test]
+fn reserve_at_start() {
+    let mut tree = AllocationTree::new(BlockGroupCount(100));
+
+    // Reserve at the start
+    tree.reserve(Extent {
+        first_block_group_index: BlockGroupIndex(0),
+        block_group_count: BlockGroupCount(10),
+    });
+
+    // The reserved amount should reduce the total free space
+    assert_eq!(tree.free_block_group_count(), BlockGroupCount(90));
+
+    // Verify the space after the reservation is still free
+    let second_part = tree.allocate(BlockGroupCount(90)).unwrap();
+    assert_eq!(second_part.first_block_group_index, BlockGroupIndex(10));
+    assert_eq!(second_part.block_group_count, BlockGroupCount(90));
+}
+
+#[test]
+fn reserve_at_end() {
+    let mut tree = AllocationTree::new(BlockGroupCount(100));
+
+    // Reserve at the end
+    tree.reserve(Extent {
+        first_block_group_index: BlockGroupIndex(90),
+        block_group_count: BlockGroupCount(10),
+    });
+
+    // The reserved amount should reduce the total free space
+    assert_eq!(tree.free_block_group_count(), BlockGroupCount(90));
+
+    // Verify the space before the reservation is still free
+    let first_part = tree.allocate(BlockGroupCount(90)).unwrap();
+    assert_eq!(first_part.first_block_group_index, BlockGroupIndex(0));
+    assert_eq!(first_part.block_group_count, BlockGroupCount(90));
+}
+
+#[test]
+fn reserve_in_middle() {
+    let mut tree = AllocationTree::new(BlockGroupCount(100));
+
+    // Reserve a portion from the middle
+    tree.reserve(Extent {
+        first_block_group_index: BlockGroupIndex(20),
+        block_group_count: BlockGroupCount(10),
+    });
+
+    // The reserved amount should reduce the total free space
+    assert_eq!(tree.free_block_group_count(), BlockGroupCount(90));
+
+    // Verify the space before the reservation is still free
+    let first_part = tree.allocate(BlockGroupCount(20)).unwrap();
+    assert_eq!(first_part.first_block_group_index, BlockGroupIndex(0));
+    assert_eq!(first_part.block_group_count, BlockGroupCount(20));
+
+    // Verify the space after the reservation is still free
+    let second_part = tree.allocate(BlockGroupCount(30)).unwrap();
+    assert_eq!(second_part.first_block_group_index, BlockGroupIndex(30));
+    assert_eq!(second_part.block_group_count, BlockGroupCount(30));
+}
+
+#[test]
+#[should_panic(expected = "Cannot reserve already allocated extent")]
+fn reserve_fails_on_allocated_extent() {
+    let mut tree = AllocationTree::new(BlockGroupCount(100));
+
+    // Allocate the first 50 blocks
+    let _allocated = tree.allocate(BlockGroupCount(50)).unwrap();
+
+    // Try to reserve space that's already allocated
+    tree.reserve(Extent {
+        first_block_group_index: BlockGroupIndex(10),
+        block_group_count: BlockGroupCount(10),
+    }); // This should panic
+}
+
+#[test]
+#[should_panic(expected = "Cannot reserve already allocated extent")]
+fn reserve_fails_when_no_free_extent() {
+    let mut tree = AllocationTree::new(BlockGroupCount(100));
+
+    // Allocate all space
+    let _allocated = tree.allocate(BlockGroupCount(100)).unwrap();
+
+    // Try to reserve when there's no free extent
+    tree.reserve(Extent {
+        first_block_group_index: BlockGroupIndex(50),
+        block_group_count: BlockGroupCount(10),
+    }); // This should panic
 }
