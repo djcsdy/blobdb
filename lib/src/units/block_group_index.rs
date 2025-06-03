@@ -1,7 +1,8 @@
+use crate::units::Count;
 use crate::units::block_group_count::BlockGroupCount;
 use derive_more::{Add, AddAssign, Deref, DerefMut, Display, From, Into, Sub, SubAssign};
 use std::cmp::Ordering;
-use std::ops::{Add, Shr};
+use std::ops::{Add, Range, RangeInclusive, Shr};
 
 #[derive(
     Eq,
@@ -66,5 +67,27 @@ impl Shr<u64> for BlockGroupIndex {
 
     fn shr(self, rhs: u64) -> Self {
         Self(*self >> rhs)
+    }
+}
+
+impl Count for Range<BlockGroupIndex> {
+    type Output = BlockGroupCount;
+
+    fn count(&self) -> Self::Output {
+        if self.end < self.start {
+            panic!("Invalid Range<BlockGroupIndex>");
+        }
+        BlockGroupCount(*(self.end - self.start))
+    }
+}
+
+impl Count for RangeInclusive<BlockGroupIndex> {
+    type Output = BlockGroupCount;
+
+    fn count(&self) -> Self::Output {
+        if self.end() < self.start() {
+            panic!("Invalid RangeInclusive<BlockGroupIndex>");
+        }
+        BlockGroupCount(*(*self.end() - *self.start()) + 1)
     }
 }
