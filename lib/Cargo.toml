@@ -16,4 +16,4 @@ linux-raw-sys = "=0.9.4"
 rustix = { version = "=1.0.8", features = ["fs", "linux_5_1"] }
 sha2 = "=0.10.9"
 tee_readwrite = "=0.2.0"
-tempfile = "=3.20.0"
+tempfile = "=3.21.0"
