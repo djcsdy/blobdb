@@ -8,7 +8,7 @@ edition = "2024"
 [dependencies]
 arrayref = "=0.3.9"
 byteorder = "=1.5.0"
-derive_more = { version = "=2.1.0", features = ["add", "add_assign", "deref", "deref_mut", "display", "from", "into"] }
+derive_more = { version = "=2.1.1", features = ["add", "add_assign", "deref", "deref_mut", "display", "from", "into"] }
 fs2 = "=0.4.3"
 hex = "=0.4.3"
 itertools = "=0.14.0"
