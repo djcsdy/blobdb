@@ -12,7 +12,7 @@ derive_more = { version = "=2.1.1", features = ["add", "add_assign", "deref", "d
 fs2 = "=0.4.3"
 hex = "=0.4.3"
 itertools = "=0.14.0"
-linux-raw-sys = "=0.9.4"
+linux-raw-sys = "=0.12.1"
 rustix = { version = "=1.0.8", features = ["fs", "linux_5_1"] }
 sha2 = "=0.10.9"
 tee_readwrite = "=0.2.0"
